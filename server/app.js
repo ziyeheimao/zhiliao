@@ -57,8 +57,8 @@ server.use(express.static('public'));
 server.use(bodyParser.json()); // 解析axios(json格式) post请求主体数据
 
 // 中间件
-server.use(main.middleware.token) // 自定义中间件 token
-server.use(main.middleware.power) // 自定义中间件 权限
+// server.use(main.middleware.token) // 自定义中间件 token
+// server.use(main.middleware.power) // 自定义中间件 权限
 
 server.use('/user', user); // 用户模块
 server.use('/ctn', ctn); // 内容模块

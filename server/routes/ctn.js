@@ -879,16 +879,16 @@ router.get(`/getHotWords`, (req, res) => {
     return false
   }
 
-  let sql = `SELECT * FROM card WHERE keyword=%?% LIMIT ?,?`
-  pool.query(sql, [keyword, page, limit], (err, result) => {
+  let sql = `SELECT * FROM paper_strip WHERE title=?` // LIMIT ?,?
+  pool.query(sql, ['%' + keyword + '%'], (err, result) => { // , page, limit
     if (err) throw err;
     resObj.data = result
 
     if (validSpeedOfProgress()) res.send(obj)
   })
 
-  let sql2 = `SELECT count(webId) AS pageCount FROM card WHERE keyword=%?%`
-  pool.query(sql2, [userId], (err, result) => {
+  let sql2 = `SELECT count(paperStripId) AS pageCount FROM paper_strip WHERE title=?`
+  pool.query(sql2, ['%' + keyword + '%'], (err, result) => {
     if (err) throw err;
 
     pageCount = Math.ceil(result[0].pageCount / limit);

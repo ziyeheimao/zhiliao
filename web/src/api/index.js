@@ -128,6 +128,6 @@ export default {
 
   // 获取搜索热词
   getHotWords (keyword) {
-    return axios.get(`/getHotWords?keyword=${keyword}`)
+    return axios.get(`/ctn/getHotWords?keyword=${keyword}`)
   }
 }

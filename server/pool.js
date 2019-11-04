@@ -7,7 +7,7 @@ var pool = mysql.createPool({
   port: '3306',
   user: 'root',
   password: '',
-  database: 'jingyi',
+  database: 'zhiliao',
   connectionLimit: 25,
   multipleStatements: true
 });
