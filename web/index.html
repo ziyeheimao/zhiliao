@@ -16,6 +16,20 @@
     html {
       font-size: 10px;
     }
+
+    /* 隐藏滚动条 ↓ */
+    html,body{
+      overflow: hidden !important;
+      overflow-y: scroll !important;
+      scrollbar-width: none !important; /* Firefox */
+      -ms-overflow-style: none !important;  /* IE 10+ */
+    }
+    html::-webkit-scrollbar,body::-webkit-scrollbar { /* WebKit */
+      width: 0 !important;
+      height: 0 !important;
+    }
+    /* 隐藏滚动条 ↑ */
+
     ul, ol {
       list-style: none;
     }

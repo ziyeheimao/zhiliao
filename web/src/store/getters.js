@@ -4,9 +4,6 @@ const getters = {
   InnerSize: (state) => { // 内容区域尺寸
     return state.InnerSize
   },
-  Mode: (state) => {
-    return state.Mode // 页面模块显示
-  },
   Token: (state) => {
     return state.Token
   },
@@ -15,6 +12,15 @@ const getters = {
   },
   User: (state) => { // 用户信息
     return state.User
+  },
+  SearchCondition: (state) => {
+    return state.SearchCondition // 搜索条件
+  },
+  Listdata: (state) => { // 搜索结果数据
+    return state.Listdata
+  },
+  PaperStripId: (state) => { // 纸条Id (跳转详情页时
+    return state.PaperStripId
   }
 }
 

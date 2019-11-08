@@ -862,44 +862,131 @@ router.post('/cardUpdate', (req, res) => {
 // 功能八、分类的分页、多表查询↑
 
 
+// 通过搜索标题形成热词
 router.get(`/getHotWords`, (req, res) => {
-  // let userId = main.token.toUserId(req.headers.token)
-  var obj = req.query;
-
+  let obj = req.query;
   let keyword = obj.keyword;
-  let page = obj.page;
-  let limit = obj.limit;
+
+  let sql = `SELECT * FROM paper_strip WHERE title LIKE ?` // LIMIT ?,?
+  pool.query(sql, ['%' + keyword + '%'], (err, data) => { // , page, limit
+    if (err) throw err;
+    res.send({code: 0, data})
+  })
+})
+
+// 标题 + 正文 + 关键字 广泛搜索
+router.post(`/widelySearch`, (req, res) => {
+  let obj = req.body;
+  let keyword = obj.keyword;
+  let resArr = []
+
+  let type = 0; // 搜索类型 0全部 1标题 2正文 3作者 4关键字
+  type = !obj.type ? 0 : Number(obj.type);
+  let count = 0;
+  if (!type) count = 40
+  else count = 10
 
   let speedOfProgress = 0; // 查询进度
   let resObj = { code: 0 } // 返回内容
 
-  let validSpeedOfProgress = function () { // 检测进度
-    speedOfProgress += 50;
-    if (speedOfProgress == 100) return true
-    return false
+  let _res = function () {
+    resArr = main.distinctById('paperStripId', resArr)
+    resObj.data = resArr
   }
 
-  let sql = `SELECT * FROM paper_strip WHERE title=?` // LIMIT ?,?
-  pool.query(sql, ['%' + keyword + '%'], (err, result) => { // , page, limit
-    if (err) throw err;
-    resObj.data = result
+  const _searchTitle = function () {
+    let sql1 = `SELECT * FROM paper_strip WHERE title LIKE ?` // 查标题
+    pool.query(sql1, ['%' + keyword + '%'], (err, result) => {
+      if (err) throw err;
+      resArr.push(...result)
+  
+      speedOfProgress += 10
+      if (speedOfProgress === count) {
+        _res();
+        res.send(resObj)
+      }
+    })
+  }
 
-    if (validSpeedOfProgress()) res.send(obj)
-  })
+  const _searchContent = function () {
+    let sql2 = `SELECT * FROM paper_strip WHERE content LIKE ?` // 查正文
+    pool.query(sql2, ['%' + keyword + '%'], (err, result) => {
+      if (err) throw err;
+      resArr.push(...result)
 
-  let sql2 = `SELECT count(paperStripId) AS pageCount FROM paper_strip WHERE title=?`
-  pool.query(sql2, ['%' + keyword + '%'], (err, result) => {
-    if (err) throw err;
+      speedOfProgress += 10
+      if (speedOfProgress === count) {
+        _res();
+        res.send(resObj)
+      }
+    })
+  }
 
-    pageCount = Math.ceil(result[0].pageCount / limit);
-    cardCount = result[0].pageCount;
+  const _searchUserName = function () {
+    let sql3 = `SELECT * FROM paper_strip WHERE userName LIKE ?` // 查作者
+    pool.query(sql3, ['%' + keyword + '%'], (err, result) => {
+      if (err) throw err;
+      resArr.push(...result)
 
-    resObj.cardCount = cardCount;                     // 卡片总数量
-    resObj.pageCount = pageCount;                     // 总页数
+      speedOfProgress += 10
+      if (speedOfProgress === count) {
+        _res();
+        res.send(resObj)
+      }
+    })
+  }
 
-    if (validSpeedOfProgress()) res.send(resObj)
-  })
+  const _searchKeyword = function () {
+    let sql4 = `SELECT * FROM paper_strip WHERE keyword LIKE ?` // 关键字
+    pool.query(sql4, ['%' + keyword + '%'], (err, result) => {
+      if (err) throw err;
+      resArr.push(...result)
+
+      speedOfProgress += 10
+      if (speedOfProgress === count) {
+        _res();
+        res.send(resObj)
+      }
+    })
+  }
+  switch (type) {
+    case 1:
+      _searchTitle()
+      break
+    case 2:
+      _searchContent()
+      break
+    case 3:
+      _searchUserName()
+      break
+    case 4:
+      _searchKeyword()
+      break
+    default:
+      _searchTitle()
+      _searchContent()
+      _searchUserName()
+      _searchKeyword()
+      break
+  }
 })
 
+
+// 通过纸条Id获取纸条信息
+router.get(`/paperStrip`, (req, res) => {
+  let obj = req.query;
+  let paperStripId = obj.paperStripId;
+
+  if (!paperStripId) {
+    res.send({code: -1, msg: '纸条Id不可为空'})
+  }
+
+  let sql = `SELECT * FROM paper_strip WHERE paperStripId=?` // LIMIT ?,?
+  pool.query(sql, [paperStripId], (err, data2) => {
+    if (err) throw err;
+    let data = data2[0]
+    res.send({code: 0, data})
+  })
+})
 //导出路由器
 module.exports = router;

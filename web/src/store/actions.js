@@ -10,8 +10,13 @@ export default {
   ARefresh: (context, data) => {
     context.commit('SRefresh', data)
   },
-
   AUser: (context, data) => {
     context.commit('SUser', data)
+  },
+  ASearchCondition: (context, data) => {
+    context.commit('SSearchCondition', data) // 搜索条件
+  },
+  AListdata: (context, data) => {
+    context.commit('SListdata', data) // 搜索结果数据
   }
 }

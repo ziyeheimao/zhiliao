@@ -13,21 +13,16 @@ export default {
     }
   },
   methods: {
-    // 节流
-    throttle () {
-      clearTimeout(this.timer)
-      this.timer = setTimeout(() => {
-        this.innerSizeCount()
-      }, 300)
-    },
-
     // 文档可视区尺寸
     innerSizeCount () {
-      let size = { // 内容区域尺寸
-        width: window.innerWidth,
-        height: window.innerHeight
-      }
-      this.$store.commit('SInnerSize', size)
+      clearTimeout(this.timer)
+      this.timer = setTimeout(() => {
+        let size = { // 内容区域尺寸
+          width: window.innerWidth,
+          height: window.innerHeight
+        }
+        this.$store.commit('SInnerSize', size)
+      }, 100)
     }
   },
   created () {
@@ -35,7 +30,7 @@ export default {
   },
   mounted () {
     window.onresize = () => {
-      this.throttle()
+      this.innerSizeCount()
     }
   }
 }

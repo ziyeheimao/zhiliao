@@ -394,6 +394,28 @@ const transform = {
   }
 }
 
+// 通过主键 id 对数组对象进行去重
+const distinctById = function (PrimaryKeyId, arr) {
+  let idList = []
+  for (let i of arr) {
+    idList.push(i[PrimaryKeyId])
+  }
+
+  idList = Array.from(new Set([...idList]))
+
+  let resArr = []
+  for (let i of idList) {
+    for (let j of arr) {
+      if (i === j[PrimaryKeyId]) {
+        resArr.push(j)
+        break
+      }
+    }
+  }
+
+  return resArr
+}
+
 module.exports = {
   serverIp,
   serverPort,
@@ -408,5 +430,6 @@ module.exports = {
   date,
   middleware,
   user,
-  transform
+  transform,
+  distinctById
 }

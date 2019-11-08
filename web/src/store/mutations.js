@@ -3,9 +3,6 @@ const mutations = {
   SInnerSize: (state, data) => { // 内容区域尺寸
     state.InnerSize = data
   },
-  SMode: (state, data) => {
-    state.Mode = data // 页面模块显示
-  },
   SToken: (state, data) => {
     state.Token = data
   },
@@ -14,6 +11,15 @@ const mutations = {
   },
   SUser: (state, data) => {
     state.User = data
+  },
+  SSearchCondition: (state, data) => { // 搜索条件
+    state.SearchCondition = data
+  },
+  SListdata: (state, data) => { // 搜索结果数据
+    state.Listdata = data
+  },
+  SPaperStripId: (state, data) => { // 纸条Id (跳转详情页时
+    state.PaperStripId = data
   }
 }
 

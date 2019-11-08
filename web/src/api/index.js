@@ -129,5 +129,14 @@ export default {
   // 获取搜索热词
   getHotWords (keyword) {
     return axios.get(`/ctn/getHotWords?keyword=${keyword}`)
+  },
+  // 标题+正文+关键字 广泛搜索
+  widelySearch (data) {
+    if (!data.type) return axios.post(`/ctn/widelySearch`, data)
+    else return axios.post(`/ctn/widelySearch`, data)
+  },
+  // 通过Id 获取纸条(帖子)
+  paperStrip (paperStripId) {
+    return axios.get(`/ctn/paperStrip?paperStripId=${paperStripId}`)
   }
 }

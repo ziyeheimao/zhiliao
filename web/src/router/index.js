@@ -40,6 +40,19 @@ const Index = resolve => {
   })
 }
 
+// List
+const List = resolve => {
+  require.ensure(['@components/List/List.vue'], () => {
+    resolve(require('@components/List/List.vue'))
+  })
+}
+
+// 详情页
+const Details = resolve => {
+  require.ensure(['@components/Details/Details.vue'], () => {
+    resolve(require('@components/Details/Details.vue'))
+  })
+}
 // // 用户中心
 // const User = resolve => {
 //   require.ensure(['@components/User/User.vue'], () => {
@@ -112,6 +125,22 @@ const router = new Router({
       path: '/index',
       name: 'Index',
       component: Index,
+      meta: {
+        // requiresAuth: true
+      }
+    },
+    {
+      path: '/list',
+      name: 'List',
+      component: List,
+      meta: {
+        // requiresAuth: true
+      }
+    },
+    {
+      path: '/details',
+      name: 'Details',
+      component: Details,
       meta: {
         // requiresAuth: true
       }
