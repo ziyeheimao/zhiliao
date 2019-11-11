@@ -1,7 +1,8 @@
 <template>
   <el-container>
-    <el-header style="outline: 1px solid #bbf;">
-      <div>用户模块</div>
+    <el-header>
+      <div class="logo">知了logo</div>
+      <User class="user"></User>
     </el-header>
 
     <el-main>
@@ -22,10 +23,12 @@
 // import api from '@api'
 // import main from '@main'
 import Search from './Index-search'
+import User from '../Modular/User'
 
 export default {
   components: {
-    Search
+    Search,
+    User
   },
   // props: [''],
   computed: {
@@ -54,19 +57,23 @@ export default {
 
 <style lang='scss' scoped>
 @import '@style/index.scss';
-.logo{
+.search-box > .logo{
   text-align: center;
   font-size: 1.8rem;
 }
 .search-box{
   padding-top: 50px;
 }
-// 新闻列表
-.newList{
-  // border: 1px solid red;
-}
+
 // 用户
 .el-header{
+  @include flex-between-center;
+  box-shadow: 2px 2px 5px #00000020;
+  background-color: #fff;
+}
+
+// 新闻列表
+.newList{
   // border: 1px solid red;
 }
 </style>

@@ -127,11 +127,6 @@ const verificationCode = {
       let sql = 'DELETE FROM verification_code WHERE userId=?'
       pool.query(sql, [userId], (err, result) => {
         if (err) throw err;
-        // if (result.affectedRows > 0) {
-        //   return true
-        // } else {
-        //   return false
-        // }
       });
     }, 30000)
   }
@@ -144,16 +139,11 @@ const token = {
     userId = userId.toString()
     let token = userId.padStart(6, random.letter(6))
     token += Math.random().toString(36).substr(2);
-
     // 根据返回的用户信息中的设置 计算token时间戳
     let timeStamp = null
-    if (user.cache === 'session') {
 
-    } else if (user.cache === 'local') {
+    timeStamp = Number((new Date()).valueOf()) + 300000; // 获取当前毫秒的时间戳
 
-    } else {
-      timeStamp = Number((new Date()).valueOf()) + Number(user.cache); // 获取当前毫秒的时间戳
-    }
 
     this._valid(userId).then(validRes => {
       if (validRes === true) { // 已有token // 更新 token
@@ -187,11 +177,6 @@ const token = {
     let sql = 'INSERT INTO token_date SET userId=?,timeStamp=?'
     pool.query(sql, [userId, timeStamp], (err, result) => {
       if (err) throw err;
-      // if (result.affectedRows > 0) {
-      //   return true;
-      // } else {
-      //   return false;
-      // }
     })
   },
   // 更新
@@ -199,11 +184,6 @@ const token = {
     let sql = 'UPDATE token_date SET timeStamp=? WHERE userId=?'
     pool.query(sql, [timeStamp, userId], (err, result) => {
       if (err) throw err;
-      // if (result.affectedRows > 0) {
-      //   res.send({ code: 200, msg: '更新成功' });
-      // } else {
-      //   res.send({ code: 301, msg: '更新失败' });
-      // }
     })
   },
   // 把token还原成uid
@@ -254,7 +234,6 @@ const middleware = {
 
     for (let i of adopt) {
       if (url.indexOf(i) !== -1) { // 访问静态资源或登录接口时 直接通过
-        console.log('url通过')
         return next()
       }
     }
@@ -262,7 +241,6 @@ const middleware = {
     let process = 0 // 进度
     let userSetTimeStamp = null // 用户设置的token时效 时间戳
     let expireTimeStamp = null // 本次登录到期时间戳
-    console.log('检测token')
     // 检测是否携带token
     if (!token_) { // 没有token
       if (adoptPath.includes(url) === false) { // 且不在不携带token可访问的范围内

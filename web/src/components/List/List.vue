@@ -19,7 +19,7 @@
 <script>
 // import api from '@api'
 // import main from '@main'
-import Search from './List-search'
+import Search from '../Modular/Search'
 import Ctn from './List-Ctn'
 
 export default {

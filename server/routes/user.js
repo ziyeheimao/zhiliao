@@ -30,19 +30,16 @@ router.post('/login', (req, res) => {
   let sql = ''
   if (main.reg.email.test(field)) {
     sql = 'SELECT * FROM user_info WHERE email=? AND password=md5(?)'
-  } else if (main.reg.phone.test(field)) {
-    sql = 'SELECT * FROM user_info WHERE phone=? AND password=md5(?)'
   } else {
     sql = 'SELECT * FROM user_info WHERE userName=? AND password=md5(?)'
   }
   //执行SQL语句，查看是否登录成功 使用用户名和密码两个条件能查询到数据
+
   pool.query(sql, [field, password], (err, result) => {
     if (err) throw err;
     //判断查询的结果（数组）长度是否大于0 大于0，说明查询到数据，有这个用户登录成功
-
     let data = result[0]
     let token = main.token.create(data)
-
 
     if (result.length > 0) {
       res.send({ code: 0, msg: '欢迎回家', data, token });

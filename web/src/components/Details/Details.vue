@@ -12,7 +12,7 @@
           <h2>{{ctnData.title}}</h2>
 
           <div>
-            <output>{{ctnData.userName}}</output>
+            <output @click="findUser(ctnData.userId)">{{ctnData.userName}}</output>
             <output>{{ctnData.releaseTime | dateTimetrans}}</output>
           </div>
 
@@ -28,7 +28,7 @@
 <script>
 import api from '@api'
 // import main from '@main'
-import Search from '../List/List-search'
+import Search from '../Modular/Search'
 
 export default {
   components: {
@@ -58,6 +58,10 @@ export default {
       api.paperStrip(this.PaperStripId).then(({data}) => {
         if (data.code === 0) this.ctnData = data.data
       })
+    },
+    // 跳转查询用户页面,通过userId 获取 该用户的所有纸条
+    findUser (userId) {
+      console.log(userId)
     }
   },
   beforeCreate () {},
@@ -93,7 +97,6 @@ export default {
   padding: 8px 15px 10px;
   background-color: #fff;
   border-radius: 5px;
-  cursor: pointer;
   box-shadow: 2px 2px 5px #00000050;
 
   & > h2 {
@@ -108,6 +111,9 @@ export default {
       padding: 5px 7px;
       border-radius: 5px;
       color: #0084ff;
+    }
+    & > output:first-child{
+      cursor: pointer;
     }
   }
   & > p {

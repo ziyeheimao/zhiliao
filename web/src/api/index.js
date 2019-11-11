@@ -4,11 +4,6 @@ export default {
 
   // -------------------------------------------------用户↓-----------------------------------------------------
 
-  // 用户登录
-  login (data) {
-    return axios.post('/user/login', data)
-  },
-
   // 检测 昵称 手机 邮箱 是否注册
   checkUserNamePhoneEmail (data, code = 0) {
     if (code === 0) {
@@ -138,5 +133,10 @@ export default {
   // 通过Id 获取纸条(帖子)
   paperStrip (paperStripId) {
     return axios.get(`/ctn/paperStrip?paperStripId=${paperStripId}`)
+  },
+
+  // 登录
+  login (data) {
+    return axios.post(`/user/login`, data)
   }
 }

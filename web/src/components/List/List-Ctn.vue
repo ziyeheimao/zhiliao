@@ -34,6 +34,10 @@ export default {
   methods: {
     details (paperStripId) {
       this.$store.commit('SPaperStripId', paperStripId)
+
+      let _paperStripId = JSON.stringify(paperStripId) // 对象转json字符串
+      window.sessionStorage.setItem('paperStripId', _paperStripId)
+
       this.$router.push('/details')
     }
   },

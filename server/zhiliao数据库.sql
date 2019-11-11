@@ -67,14 +67,14 @@ CREATE TABLE paper_strip(
 
 #向纸条表插入数据
 INSERT INTO paper_strip VALUES
-(NULL,1,"箫","标题1qaz标题要长~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~","内容","1 2 3","http://127.0.0.1:666/static/userPic/1_Pic.gif",1572851767000),
+(NULL,1,"箫","标题1qaz标题要长~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~","分享一下商演价格","1 2 3","http://127.0.0.1:666/static/userPic/1_Pic.gif",1572851767000),
 (NULL,1,"箫","标题2wsx","vue过滤器和案例实现 - 简书2018年12月18日 - 添加一行代码Vue.config.devtools = true; 使用devtools插入代码.png vue调试面板.png vue过滤器 过滤器只会改变显示结果,而不是修改数据 过滤器调...简书社区 - 百度快照Vue.js中过滤器(filter)的使用 - 吴佼奋 - 博客园2019年7月24日 - 3、局部过滤器 局部过滤器的有参和无参的定义和使用方法与全局的过滤器一样。唯一的区别在于局部过滤器是定义在vue的实例中。其作用的区域也是vue实例...www.cnblogs.com...  - 百度快照vue 过滤器使用的传参说明 - 紫藤萝yu - 博客园2018年11月13日-后面发现只需要写一个过滤器即可,需要传入需要转换的值,以及用于...vue 过滤器基本使用 - Mr.曹 - 博客园2019年01月31日-vue 过滤器基本使用 Vue.js 允许你自定义过滤器,可被用于一些常见...vue自定义过滤器的创建与使用 - gitByLegend - 博客园2019年05月15日-vue自定义过滤器的创建与使用 原文地址 过滤器:生活中有很多例子,...CSDN技术社区 - 百度快照Vue.js的过滤器基本使用 - 唯品秀前端博客2019年2月15日 - 过滤器的介绍 1、在Vue中使用过滤器(Filters)来渲染数据是一种很有趣的方式。 2、首先我们要知道,Vue中的过滤器不能替代Vue中的methods、computed或者...","4 4 5","http://127.0.0.1:666/static/userPic/1_Pic.gif",1572852767000),
-(NULL,1,"箫","标题3edc","内容","5 6 7","http://127.0.0.1:666/static/userPic/1_Pic.gif",1572853767000),
-(NULL,1,"箫","标题4rfv","内容","8 9 0","http://127.0.0.1:666/static/userPic/1_Pic.gif",1572854767000),
-(NULL,1,"箫","标题5tgb","内容","10 11 12","http://127.0.0.1:666/static/userPic/1_Pic.gif",1572557767000),
-(NULL,1,"箫","标题6yhn","内容","13 41 14","http://127.0.0.1:666/static/userPic/1_Pic.gif",1572617767000),
-(NULL,2,"筱竹听雨","标题7ujm","内容","15 16 17","http://127.0.0.1:666/static/userPic/1_Pic.gif",1573857767000),
-(NULL,2,"筱竹听雨","标题8ik","内容","关键词1 关键词2 关键词3","http://127.0.0.1:666/static/userPic/1_Pic.gif",1572457767000),
+(NULL,1,"箫","标题3edc","你们知道赛前说垃圾话和赛后说垃圾话的区别吗，当时全场包括LWX后来都觉得这句话说得有多不合时宜","5 6 7","http://127.0.0.1:666/static/userPic/1_Pic.gif",1572853767000),
+(NULL,1,"箫","标题4rfv","各位老铁，你们觉得米加勒会领盒饭嘛？","8 9 0","http://127.0.0.1:666/static/userPic/1_Pic.gif",1572854767000),
+(NULL,1,"箫","标题5tgb","我们助教老师画的，属于什么水平？","10 11 12","http://127.0.0.1:666/static/userPic/1_Pic.gif",1572557767000),
+(NULL,1,"箫","标题6yhn","这个兄弟刚步入社会第一次和领导吃饭，你们觉得会是什么结果","13 41 14","http://127.0.0.1:666/static/userPic/1_Pic.gif",1572617767000),
+(NULL,2,"筱竹听雨","标题7ujm","新手表示刚看完漫画，准备追小说，老鸟们有什么建设性的意见没","15 16 17","http://127.0.0.1:666/static/userPic/1_Pic.gif",1573857767000),
+(NULL,2,"筱竹听雨","标题8ik","贴吧即百度贴吧，是百度旗下独立品牌，全球最大的中文社区。贴吧的创意来自于百度首席执行官李彦宏：结合搜索引擎建立一个在线的交流平台，让那些对同一个话题感兴趣的人们聚集在一起，方便地展开交流和互相帮助。贴吧是一种基于关键词的主...","关键词1 关键词2 关键词3","http://127.0.0.1:666/static/userPic/1_Pic.gif",1572457767000),
 (NULL,2,"筱竹听雨","标题9ol","内容","关键词1 关键词2 关键词3","http://127.0.0.1:666/static/userPic/1_Pic.gif",1572557767000),
 (NULL,2,"筱竹听雨","标题10p","内容","关键词1 关键词2 关键词3","http://127.0.0.1:666/static/userPic/1_Pic.gif",15728657767000),
 (NULL,2,"筱竹听雨","标题11,","内容","关键词1 关键词2 关键词3","http://127.0.0.1:666/static/userPic/1_Pic.gif",1572877767000),
@@ -88,6 +88,29 @@ INSERT INTO paper_strip VALUES
 (NULL,3,"子夜黑猫","标题18&*(","内容","关键词1 关键词2 关键词3","http://127.0.0.1:666/static/userPic/1_Pic.gif",1572845776700),
 (NULL,3,"子夜黑猫","标题19)_+","内容","关键词1 关键词2 关键词3","http://127.0.0.1:666/static/userPic/1_Pic.gif",1572867767000);
 
+
+
+#验证码表
+CREATE TABLE verification_code(
+    verificationCodeId INT PRIMARY KEY AUTO_INCREMENT,      #验证码id主键+自增
+    userId INT,                                             #用户ID 关联用户ID表
+
+    verificationCode VARCHAR(4) NOT NULL,                   #四位验证码
+
+    FOREIGN KEY(userId) REFERENCES user_info(userId)        #外键
+);
+
+
+
+#token_date表
+CREATE TABLE token_date(
+    tokenDateId INT PRIMARY KEY AUTO_INCREMENT,             #用户id主键+自增
+    userId INT,                                             #用户ID 关联用户ID表
+
+    timeStamp BIGINT NOT NULL,                              #token到期时 时间戳
+
+    FOREIGN KEY(userId) REFERENCES user_info(userId)        #外键
+)
 
 
 -- #网址表 由用户提交
@@ -234,28 +257,4 @@ INSERT INTO paper_strip VALUES
 -- (NULL,2,2,12),
 -- (NULL,1,2,58);
 
-
-
-
--- #验证码表
--- CREATE TABLE verification_code(
---     verificationCodeId INT PRIMARY KEY AUTO_INCREMENT,      #验证码id主键+自增
---     userId INT,                                             #用户ID 关联用户ID表
-
---     verificationCode VARCHAR(4) NOT NULL,                   #四位验证码
-
---     FOREIGN KEY(userId) REFERENCES user_info(userId)        #外键
--- );
-
-
-
--- #token_date表
--- CREATE TABLE token_date(
---     tokenDateId INT PRIMARY KEY AUTO_INCREMENT,             #用户id主键+自增
---     userId INT,                                             #用户ID 关联用户ID表
-
---     timeStamp BIGINT NOT NULL,                              #token到期时 时间戳
-
---     FOREIGN KEY(userId) REFERENCES user_info(userId)        #外键
--- )
 

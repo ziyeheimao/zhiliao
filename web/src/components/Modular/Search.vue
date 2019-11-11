@@ -1,59 +1,81 @@
 <template>
-  <div class="search">
-    <!-- 搜索栏 -->
-    <!-- autofocus -->
-    <el-input
-      id="searchInput"
-      clearable
-      :style="'width:' + inputWidth + 'px;'"
-      class="input-with-select"
-      placeholder="人傻才要多xiao习(๑•̀ㅂ•́)و✧"
+  <section class="ctn">
+    <!-- logo -->
+    <div class="logo">logo</div>
 
-      v-model="keyword"
-      @keyup.native="keyupSearch($event)"
-      @focus="inputFocus"
-      @blur="inputBlur">
+    <!-- 搜索 -->
+    <div class="search-box">
+      <div class="search">
+        <!-- 搜索栏 -->
+        <el-input
+          id="searchInput"
+          clearable
+          :style="'width:' + inputWidth + 'px;'"
+          class="input-with-select"
+          placeholder="人傻才要多xiao习(๑•̀ㅂ•́)و✧"
 
-      <el-button slot="append" icon="el-icon-search" @click="search">知了</el-button>
-    </el-input>
+          v-model="keyword"
+          @keyup.native="keyupSearch($event)"
+          @focus="inputFocus"
+          @blur="inputBlur">
 
-    <!-- 搜索辅助 -->
-    <ul :style="'width:' + inputWidth + 'px;' + isShow"
-      class="hotWords" id="hotWords">
+          <el-button slot="append" icon="el-icon-search" @click="search">知了</el-button>
+        </el-input>
 
-      <li v-for="(v, k) in res.hotWords" :key="k"
-        @click="clickLi(v)" :class="k === activateIndex ? 'activate' : ''">
-        <span :style="'max-width:'+(inputWidth-35)+'px'">{{v}}</span>
-        <i class="el-icon-close" v-show="mode" @click.stop="del(v)"></i>
-      </li>
+        <!-- 搜索辅助 -->
+        <ul :style="'width:' + inputWidth + 'px;' + isShow"
+          class="hotWords" id="hotWords">
 
-    </ul>
-  </div>
+          <li v-for="(v, k) in res.hotWords" :key="k"
+            @click="clickLi(v)" :class="k === activateIndex ? 'activate' : ''">
+            <span :style="'max-width:'+(inputWidth-35)+'px'">{{v}}</span>
+            <i class="el-icon-close" v-show="mode" @click.stop="del(v)"></i>
+          </li>
+
+        </ul>
+      </div>
+      <el-radio-group v-model="type">
+        <el-radio :label="0">全部</el-radio>
+        <el-radio :label="1">标题</el-radio>
+        <el-radio :label="2">正文</el-radio>
+        <el-radio :label="3">作者</el-radio>
+        <el-radio :label="4">关键词</el-radio>
+      </el-radio-group>
+    </div>
+
+    <!-- 用户模块 -->
+    <User></User>
+  </section>
 </template>
 
 <script>
 import api from '@api'
 import main from '@main'
-
+import User from './User'
 export default {
   components: {
-    // x
+    User
   },
   // props: [''],
   computed: {
-
+    SearchCondition () {
+      return this.$store.getters.SearchCondition
+    }
   },
   data () {
     return {
-      inputWidth: 450, // 搜索栏&搜索辅助宽度
+      type: 0,
       keyword: '', // 搜索关键字
-      timer: null, // 节流
-      activateIndex: -1, // 当前激活颜色的选项
-      mode: false, // 关键词模式 true搜索历史(显示关闭的x) false热词(不显示关闭的x)
-      hover: false, // 鼠标是否悬停在ul (热词&历史)上
+
       res: {
         hotWords: []
       },
+
+      inputWidth: 450, // 搜索栏&搜索辅助宽度
+      timer: null, // 节流
+      activateIndex: -1, // 当前激活颜色的选项
+      mode: false, // 关键词模式 true搜索历史(显示关闭的x) false热词(不显示关闭的x)
+
       isShow: 'display: none;' // 'display: block;' // 热词辅助和搜索历史是否显示
     }
   },
@@ -68,17 +90,17 @@ export default {
       clearTimeout(this.timer)
       this.timer = setTimeout(() => {
         let data = {
-          keyword: this.keyword
+          keyword: this.keyword,
+          type: this.type
         }
-
-        let searchCondition = JSON.stringify(data) // 对象转json字符串
-        window.sessionStorage.setItem('searchCondition', searchCondition)
-
-        this.$store.commit('SSearchCondition', data)
-
+        api.widelySearch(data).then(({data}) => {
+          if (data.code === 0) this.$store.dispatch('AListdata', data.data)
+        })
         this.cache()
-        this.$router.push('/list')
+        this.isShow = 'display: none;' // 隐藏辅助
+        document.getElementById('searchInput').blur() // 失去焦点
       }, 300)
+      if (this.$route.name !== 'List') this.$router.push('./list')
     },
     // 缓存搜索历史
     cache () {
@@ -181,10 +203,16 @@ export default {
       setTimeout(() => {
         this.isShow = 'display: block;'
       }, 100)
+    },
+    init () {
+      this.keyword = this.SearchCondition.keyword
+      if (this.keyword !== '' && this.$route.name === 'List') this.search()
     }
   },
   beforeCreate () {},
-  created () {},
+  created () {
+    this.init()
+  },
   beforeMount () {},
   mounted () {},
   beforeUpdate () {},
@@ -206,12 +234,16 @@ export default {
 </style>
 <style lang='scss' scoped>
 @import '@style/index.scss';
+.ctn{
+  width: 100%;
+  height: 100%;
+  @include flex-between-center;
+}
 .search{
   @include flex-center-center;
   flex-direction: column;
   flex-wrap: wrap;
 
-  margin-top: 15px;
   position: relative;
 }
 .search>.hotWords{
@@ -257,5 +289,24 @@ export default {
 // 搜搜辅助 close
 .search>.hotWords>li>i:hover{
   color: red;
+}
+
+// 搜索赛选与搜索辅助文字层级调整
+.search{
+  position: relative;
+  z-index: 2;
+}
+.el-radio-group{
+  position: relative;
+  z-index: 1;
+}
+
+//
+.search-box{
+  display: flex;
+  flex-direction: column;
+  & > .el-radio-group {
+    margin: 10px 0 0 5px;
+  }
 }
 </style>
