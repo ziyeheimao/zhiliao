@@ -1,0 +1,117 @@
+<template>
+  <el-form :model="form" :rules="rules" ref="form">
+    <el-form-item prop="userName">
+      <el-input clearable placeholder="昵称" v-model="form.userName"></el-input>
+    </el-form-item>
+
+    <el-form-item prop="email">
+      <el-input clearable placeholder="电子邮箱" v-model="form.email"></el-input>
+    </el-form-item>
+
+    <el-form-item prop="password">
+      <el-input clearable placeholder="密码" v-model="form.password" show-password></el-input>
+    </el-form-item>
+
+    <el-form-item prop="sex">
+      <el-radio-group v-model="form.sex">
+        <el-radio :label="0">保密</el-radio>
+        <el-radio :label="1">男</el-radio>
+        <el-radio :label="2">女</el-radio>
+      </el-radio-group>
+    </el-form-item>
+
+    <el-form-item class="btn">
+      <el-button type='primary' @click="setUserInfo('form')">保 存</el-button>
+    </el-form-item>
+  </el-form>
+</template>
+
+<script>
+import api from '@api'
+import main from '@main'
+
+export default {
+  components: {
+    // x
+  },
+  // props: [''],
+  computed: {
+    User () {
+      return this.$store.getters.User
+    }
+  },
+  data () {
+    return {
+      form: {
+        userName: '',
+        email: '',
+        password: '',
+        sex: 0
+      },
+      rules: {
+        userName: [
+          { required: true, message: '昵称不可为空', trigger: 'blur' },
+          { min: 1, max: 20, message: '昵称在1到20位之间', trigger: 'blur' }
+        ],
+        email: [
+          // eslint-disable-next-line no-useless-escape
+          { pattern: /^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/, message: '请输入正确的邮箱格式' },
+          { required: true, message: '邮箱不可为空', trigger: 'blur' }
+        ],
+        verificationCode: [
+          { required: true, message: '验证码不可为空', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '密码不可为空', trigger: 'blur' },
+          { min: 1, max: 20, message: '密码在1到20位之间', trigger: 'blur' }
+        ]
+      }
+
+    }
+  },
+  methods: {
+    init () {
+      this.form.userName = this.User.userName
+      this.form.email = this.User.email
+      this.form.sex = this.User.sex
+    },
+
+    // 修改个人信息
+    setUserInfo (form) {
+      this.$refs[form].validate(valid => {
+        if (valid) {
+          api.setUserInfo(this.form).then(({data}) => {
+            main.msg(data.code, data.msg)
+          })
+        }
+      })
+    }
+  },
+  beforeCreate () {},
+  created () {
+    this.init()
+  },
+  beforeMount () {},
+  mounted () {},
+  beforeUpdate () {},
+  updated () {},
+  beforeDestroy () {},
+  deactivated () {},
+  watch: {}
+
+}
+</script>
+
+<style lang='scss' scoped>
+@import '@style/index.scss';
+//
+.el-form{
+  text-align: center;
+  margin-top: 50px;
+}
+.el-form-item{
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 600px;
+}
+</style>
