@@ -5,20 +5,21 @@
     <ul>
       <li v-if="!Token" @click="dialogVisible = true">登录 / 注册</li>
       <li v-if="Token" @click="to(1)">个人中心</li>
+      <li v-if="Token" @click="to(3)">我的纸条</li>
       <li v-if="Token" @click="to(2)">发布纸条</li>
       <li v-if="Token" @click="clearCache">安全退出</li>
     </ul>
 
     <el-dialog
       :visible.sync="dialogVisible"
-      width="650px"
+      :width="width > 768 ? '650px' : '80%'"
       append-to-body>
 
       <el-tabs v-model="activeName">
         <!-- 登录 -->
         <el-tab-pane label="登录" name="login">
 
-          <el-form :model="loginForm" :rules="rules" ref="rules">
+          <el-form :model="loginForm" :rules="rules" ref="loginForm">
             <el-form-item prop="field">
               <el-input clearable placeholder="昵称 / 邮箱" v-model="loginForm.field" @keyup.native="keyup($event)"></el-input>
             </el-form-item>
@@ -33,14 +34,14 @@
         <!-- 注册 -->
         <el-tab-pane label="注册" name="reg">
 
-          <el-form :model="regForm" :rules="rules" ref="rules">
+          <el-form :model="regForm" :rules="rules" ref="regForm">
             <el-form-item prop="userName">
-              <el-input clearable placeholder="昵称" v-model="regForm.userName" @keyup.native="keyup($event)"></el-input>
+              <el-input clearable placeholder="昵称" v-model="regForm.userName" @keyup.native="keyup($event)" @blur="checkUserNamePhoneEmail(regForm.userName, 'userName')"></el-input>
             </el-form-item>
 
             <el-form-item prop="email">
-              <el-input clearable placeholder="邮箱" v-model="regForm.email" @keyup.native="keyup($event)">
-                <el-button slot="append">获取验证码</el-button>
+              <el-input clearable placeholder="邮箱" v-model="regForm.email" @keyup.native="keyup($event)" @blur="checkUserNamePhoneEmail(regForm.email, 'email')">
+                <el-button slot="append" @click="verificationCode(regForm.email)">获取验证码</el-button>
               </el-input>
             </el-form-item>
 
@@ -58,10 +59,10 @@
         <!-- 忘记密码 -->
         <el-tab-pane label="忘记密码" name="forgetPassword">
 
-          <el-form :model="forgetPasswordFrom" :rules="rules" ref="rules">
+          <el-form :model="forgetPasswordFrom" :rules="rules" ref="forgetPasswordFrom">
             <el-form-item prop="email">
               <el-input clearable placeholder="邮箱" v-model="forgetPasswordFrom.email" @keyup.native="keyup($event)">
-                <el-button slot="append">获取验证码</el-button>
+                <el-button slot="append" @click="verificationCode(forgetPasswordFrom.email)">获取验证码</el-button>
               </el-input>
             </el-form-item>
 
@@ -103,6 +104,9 @@ export default {
     },
     userPic () {
       return this.$store.getters.User.userPic ? this.$store.getters.User.userPic : '../../../static/img/userPic.png'
+    },
+    width () {
+      return this.$store.getters.InnerSize.width
     }
   },
   data () {
@@ -121,13 +125,14 @@ export default {
         userName: '',
         email: '',
         verificationCode: '',
-        password: '4869'
+        password: ''
       },
       // 忘记密码
       forgetPasswordFrom: {
         email: '',
         verificationCode: '',
-        password: '4869'
+        password: '',
+        field: '' // !!
       },
 
       // 表单验证
@@ -150,7 +155,9 @@ export default {
         password: [
           { required: true, message: '密码不可为空', trigger: 'blur' },
           { min: 1, max: 20, message: '密码在1到20位之间', trigger: 'blur' }
-        ]
+        ],
+        isUserName: false,
+        isEmail: false
       }
     }
   },
@@ -160,51 +167,122 @@ export default {
         this.$router.push('/user')
       } else if (type === 2) {
         this.$router.push('/paperStrip')
+      } else if (type === 3) {
+        this.$router.push({
+          name: `FindUser`,
+          query: {
+            userName: this.User.userName, userId: this.User.userId
+          }
+        })
       }
     },
+
     // 按回车
     keyup (e) {
-      if (e.keyCode === 13) {
-        this.submit()
-      }
+      if (e.keyCode === 13) this.submit()
     },
     submit () {
       if (this.activeName === 'login') {
-        this.login()
+        this.login('loginForm')
       } else if (this.activeName === 'reg') {
-        this.reg()
+        this.reg('regForm')
       } else if (this.activeName === 'forgetPassword') {
-        this.forgetPassword()// 忘记密码
+        this.forgetPassword('forgetPasswordFrom')// 忘记密码
       }
     },
+
     // 登录
-    login () {
-      clearTimeout(this.time)
-      this.time = setTimeout(() => {
-        api.login(this.loginForm).then(({data}) => {
-          if (data.code === 0) {
-            let token = data.token
-            window.sessionStorage.setItem('token', token)
-            this.$store.dispatch('AToken', token)
+    login (loginForm) {
+      this.$refs[loginForm].validate(valid => {
+        if (valid) {
+          clearTimeout(this.time)
+          this.time = setTimeout(() => {
+            api.login(this.loginForm).then(({data}) => {
+              if (main.msg(data.code, data.msg)) {
+                let token = data.token
+                window.sessionStorage.setItem('token', token)
+                this.$store.dispatch('AToken', token)
 
-            this.$store.dispatch('AUser', data.data)
-            let user = JSON.stringify(data.data) // 对象转json字符串
-            window.sessionStorage.setItem('user', user)
+                this.$store.dispatch('AUser', data.data)
+                let user = JSON.stringify(data.data) // 对象转json字符串
+                window.sessionStorage.setItem('user', user)
 
-            this.dialogVisible = false
-          } else main.openWarningInfo(data.msg)
-        })
-      }, 300)
+                this.dialogVisible = false
+              }
+            })
+          }, 300)
+        }
+      })
     },
+
     // 注册
-    reg () {
-      clearTimeout(this.time)
-      this.time = setTimeout(() => {
-
-      }, 300)
+    reg: async function (regForm) {
+      await this.checkUserNamePhoneEmail(this.regForm.userName, 'userName')
+      await this.checkUserNamePhoneEmail(this.regForm.email, 'email')
+      await this._reg(regForm)
     },
+    _reg (regForm) {
+      this.$refs[regForm].validate(valid => {
+        if (valid * this.rules.isUserName * this.rules.isEmail) {
+          clearTimeout(this.time)
+          this.time = setTimeout(() => {
+            api.register(this.regForm).then(({data}) => {
+              if (main.msg(data.code, data.msg)) this.activeName = 'login'
+            })
+          }, 300)
+        }
+      })
+    },
+
+    // 获取验证码
+    verificationCode (email) {
+      api.verificationCode(email).then(({data}) => {
+        console.log(data)
+      })
+    },
+
     // 忘记密码
-    forgetPassword () {},
+    forgetPassword (forgetPasswordFrom) {
+      this.$refs[forgetPasswordFrom].validate(valid => {
+        if (valid) {
+          this.forgetPasswordFrom.field = this.forgetPasswordFrom.email
+
+          api.forgetPassword(this.forgetPasswordFrom).then(({data}) => {
+            if (main.msg(data.code, data.msg)) this.activeName = 'login'
+          })
+        }
+      })
+    },
+
+    // 检测 昵称 手机 邮箱 是否已被占用
+    checkUserNamePhoneEmail (value, type) {
+      if (value === '') return
+      return new Promise((resolve, reject) => {
+        let data = { field: value }
+        api.checkUserNamePhoneEmail(data, 0).then(({data}) => {
+          if (main.msg(data.code, data.msg)) {
+            switch (type) {
+              case 'userName':
+                this.rules.isUserName = true
+                break
+              case 'email':
+                this.rules.isEmail = true
+                break
+            }
+          } else {
+            switch (type) {
+              case 'userName':
+                this.rules.isUserName = false
+                break
+              case 'email':
+                this.rules.isEmail = false
+                break
+            }
+          }
+          resolve()
+        })
+      })
+    },
 
     // 退出登录 清除缓存
     clearCache () {
@@ -212,6 +290,7 @@ export default {
       this.$store.commit('SToken', '')
       this.$store.commit('SUser', '')
       if (this.$route.path !== '/' && this.$route.path !== '/index') this.$router.push('/')
+      main.openSuccessInfo('退出成功')
     }
   },
   beforeCreate () {},

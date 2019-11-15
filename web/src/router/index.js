@@ -45,26 +45,19 @@ const PaperStrip = resolve => {
   })
 }
 
-// // 友情链接
-// const Links = resolve => {
-//   require.ensure(['@components/Links/Links.vue'], () => {
-//     resolve(require('@components/Links/Links.vue'))
-//   })
-// }
+// 查找用户
+const FindUser = resolve => {
+  require.ensure(['@components/FindUser/FindUser.vue'], () => {
+    resolve(require('@components/FindUser/FindUser.vue'))
+  })
+}
 
-// // 关于本站
-// const About = resolve => {
-//   require.ensure(['@components/About/About.vue'], () => {
-//     resolve(require('@components/About/About.vue'))
-//   })
-// }
-
-// // 在线留言
-// const Message = resolve => {
-//   require.ensure(['@components/Message/Message.vue'], () => {
-//     resolve(require('@components/Message/Message.vue'))
-//   })
-// }
+// 刷新 空页面
+const Blank = resolve => {
+  require.ensure(['@components/Blank/Blank.vue'], () => {
+    resolve(require('@components/Blank/Blank.vue'))
+  })
+}
 
 // 404
 const NotFound = resolve => {
@@ -83,15 +76,6 @@ const router = new Router({
       name: 'Test',
       component: Test
     },
-    // {
-    //   path: '/inlet',
-    //   name: 'Inlet',
-    //   component: Inlet
-    // },
-    // {
-    //   path: '/login',
-    //   redirect: '/inlet' // 重定向到入口页面
-    // },
     {
       path: '/',
       component: Index,
@@ -139,38 +123,22 @@ const router = new Router({
         requiresAuth: true
       }
     },
-    // {
-    //   path: '/recommend',
-    //   name: 'Recommend',
-    //   component: Recommend,
-    //   meta: {
-    //     requiresAuth: true
-    //   }
-    // },
-    // {
-    //   path: '/links',
-    //   name: 'Links',
-    //   component: Links,
-    //   meta: {
-    //     requiresAuth: true
-    //   }
-    // },
-    // {
-    //   path: '/about',
-    //   name: 'About',
-    //   component: About,
-    //   meta: {
-    //     requiresAuth: true
-    //   }
-    // },
-    // {
-    //   path: '/message',
-    //   name: 'Message',
-    //   component: Message,
-    //   meta: {
-    //     requiresAuth: true
-    //   }
-    // },
+    {
+      path: '/findUser',
+      name: 'FindUser',
+      component: FindUser,
+      meta: {
+        // requiresAuth: true
+      }
+    },
+    {
+      path: '/blank',
+      name: 'Blank',
+      component: Blank,
+      meta: {
+        // requiresAuth: true
+      }
+    },
     {
       path: '/404',
       name: 'NotFound',

@@ -28,15 +28,23 @@ CREATE TABLE user_info(
 INSERT INTO user_info VALUES
 (NULL,"819405241@qq.com","箫",md5("4869"),1,"http://127.0.0.1:666/static/userPic/1_Pic.gif"),
 (NULL,"819405242@qq.com","筱竹听雨",md5("4869"),2,"http://127.0.0.1:666/static/userPic/2_Pic.gif"),
-(NULL,"819405243@qq.com","子夜黑猫",md5("4869"),2,"http://127.0.0.1:666/static/userPic/2_Pic.gif"),
-(NULL,"819405244@qq.com","箫羽叶",md5("4869"),0,NULL),
-(NULL,"819405245@qq.com","战神无双",md5("4869"),0,NULL),
-(NULL,"819405246@qq.com","麦克斯韦的妖精",md5("4869"),2,NULL),
-(NULL,"819405247@qq.com","棍+球=糖葫芦",md5("4869"),2,NULL),
-(NULL,"819405248@qq.com","halihali",md5("4869"),0,NULL),
-(NULL,"819405250@qq.com","bilibili",md5("4869"),0,NULL),
-(NULL,"819405251@qq.com","dilidili",md5("4869"),0,NULL),
-(NULL,"819405252@qq.com","zilizili",md5("4869"),0,NULL);
+(NULL,"819405243@qq.com","子夜黑猫",md5("4869"),2,"http://127.0.0.1:666/static/userPic/9.jpg"),
+(NULL,"819405244@qq.com","箫羽叶",md5("4869"),1,'http://127.0.0.1:666/static/userPic/4.jpg'),
+(NULL,"819405245@qq.com","战神无双",md5("4869"),0,'http://127.0.0.1:666/static/userPic/5.jpg'),
+(NULL,"819405246@qq.com","麦克斯韦的妖精",md5("4869"),2,'http://127.0.0.1:666/static/userPic/6.jpg'),
+(NULL,"819405247@qq.com","棍+球=糖葫芦",md5("4869"),2,'http://127.0.0.1:666/static/userPic/7.jpg'),
+(NULL,"819405248@qq.com","halihali",md5("4869"),0,'http://127.0.0.1:666/static/userPic/8.jpg'),
+(NULL,"819405250@qq.com","bilibili",md5("4869"),0,'http://127.0.0.1:666/static/userPic/9.jpg'),
+(NULL,"819405251@qq.com","dilidili",md5("4869"),0,'http://127.0.0.1:666/static/userPic/4.jpg'),
+(NULL,"819405252@qq.com","zilizili",md5("4869"),0,'http://127.0.0.1:666/static/userPic/5.jpg'),
+(NULL,"819405253@qq.com","箫羽姌",md5("4869"),2,'http://127.0.0.1:666/static/userPic/8.jpg'),
+(NULL,"819405254@qq.com","箫箫",md5("4869"),2,'http://127.0.0.1:666/static/userPic/2_Pic.gif'),
+(NULL,"819405255@qq.com","箫箫乐",md5("4869"),0,'http://127.0.0.1:666/static/userPic/10.jpg'),
+(NULL,"819405256@qq.com","箫羽夜",md5("4869"),2,'http://127.0.0.1:666/static/userPic/11.jpg'),
+(NULL,"819405257@qq.com","箫消乐",md5("4869"),2,'http://127.0.0.1:666/static/userPic/12.jpg'),
+(NULL,"819405258@qq.com","箫姌",md5("4869"),2,'http://127.0.0.1:666/static/userPic/13.jpg');
+
+
 -- (NULL,"819405241@qq.com","15231291161","箫",md5("4869"),NULL,NULL,NULL,NULL,1,"http://127.0.0.1:666/static/userPic/1_Pic.gif",28800000),
 -- (NULL,"819405242@qq.com","15231291162","筱竹听雨",md5("4869"),NULL,NULL,NULL,NULL,2,"http://127.0.0.1:666/static/userPic/2_Pic.gif",28800000),
 -- (NULL,"819405243@qq.com","15231291163","子夜黑猫",md5("4869"),NULL,NULL,NULL,NULL,2,"http://127.0.0.1:666/static/userPic/2_Pic.gif",28800000),

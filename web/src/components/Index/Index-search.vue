@@ -5,7 +5,7 @@
     <el-input
       id="searchInput"
       clearable
-      :style="'width:' + inputWidth + 'px;'"
+      :style="'width:' + (Width > 768 ? inputWidth + 'px;' : '100%;')"
       class="input-with-select"
       placeholder="人傻才要多xiao习(๑•̀ㅂ•́)و✧"
 
@@ -18,12 +18,12 @@
     </el-input>
 
     <!-- 搜索辅助 -->
-    <ul :style="'width:' + inputWidth + 'px;' + isShow"
+    <ul :style="'width:' + (Width > 768 ? inputWidth + 'px;' : '100%;') + isShow"
       class="hotWords" id="hotWords">
 
       <li v-for="(v, k) in res.hotWords" :key="k"
         @click="clickLi(v)" :class="k === activateIndex ? 'activate' : ''">
-        <span :style="'max-width:'+(inputWidth-35)+'px'">{{v}}</span>
+        <span :style="'max-width:' + (Width > 768 ? inputWidth + 'px;' : '100%;')">{{v}}</span>
         <i class="el-icon-close" v-show="mode" @click.stop="del(v)"></i>
       </li>
 
@@ -41,7 +41,9 @@ export default {
   },
   // props: [''],
   computed: {
-
+    Width () {
+      return this.$store.getters.InnerSize.width
+    }
   },
   data () {
     return {

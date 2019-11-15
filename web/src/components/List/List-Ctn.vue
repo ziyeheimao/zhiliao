@@ -4,9 +4,13 @@
       <h4>{{v.title}}</h4>
 
       <div>
-        <!-- <img src="" alt=""> -->
-        <output>{{v.userName}}</output>
-        <output>{{v.releaseTime | dateTimetrans}}</output>
+        <el-link type="primary" @click.stop="findUser(v)">
+          <output>{{v.userName}}</output>
+        </el-link>
+
+        <el-link type="primary" :underline="false">
+          <output>{{v.releaseTime | dateTimetrans}}</output>
+        </el-link>
       </div>
 
       <p v-html="v.content"></p>
@@ -32,6 +36,14 @@ export default {
     return {}
   },
   methods: {
+    findUser (user) {
+      this.$router.push({
+        name: `FindUser`,
+        query: {
+          userName: user.userName, userId: user.userId
+        }
+      })
+    },
     details (v) {
       let paperStripId = v.paperStripId
       this.$store.commit('SPaperStripId', paperStripId)
@@ -72,6 +84,7 @@ export default {
   & > h4 {
     margin: 10px 0 7px 0;
     max-width: 70%;
+    font-size: 1.5rem;
     @include overflow-ellipsis;
   }
   & > div {

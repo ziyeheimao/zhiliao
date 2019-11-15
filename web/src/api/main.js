@@ -67,8 +67,8 @@ const strToH5 = function (val) {
   val = val.replace(/《《/g, '<h4>') // 标题替换
   val = val.replace(/》》/g, '</h4>') // 标题替换
 
-  val = val.replace(/!!/g, '<pre><code>') // 代码块替换
-  val = val.replace(/@@/g, '</code></pre>') // 代码块替换
+  val = val.replace(/@@/g, '<pre><code>') // 代码块替换
+  val = val.replace(/##/g, '</code></pre>') // 代码块替换
   return val
 }
 const H5ToStr = function (val) {
@@ -77,8 +77,8 @@ const H5ToStr = function (val) {
   val = val.replace(/<h4>/ig, '《《') // 标题替换
   val = val.replace(/<\/h4>/ig, '》》') // 标题替换
 
-  val = val.replace(/<pre><code>/ig, '!!') // 代码块替换
-  val = val.replace(/<\/code><\/pre>/ig, '@@') // 代码块替换
+  val = val.replace(/<pre><code>/ig, '@@') // 代码块替换
+  val = val.replace(/<\/code><\/pre>/ig, '##') // 代码块替换
   return val
 }
 // 导出

@@ -131,7 +131,7 @@ export default {
                 this.$store.dispatch('ARefreshUserInfo', !this.RefreshUserInfo) // 刷新
               }
             }).catch((error) => {
-              console.log('成功', error)
+              console.log('err', error)
             })
           })
         }

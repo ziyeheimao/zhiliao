@@ -6,13 +6,10 @@ const main = require('../main.js'); // 工具类
 const fs = require('fs');                // 文件管理
 const multer = require('multer');        // 文件上传
 
-
 //创建空路由器
 var router = express.Router();
 
-//添加路由
-
-// 功能一、用户登录 ↓
+// 用户登录 ↓
 router.post('/login', (req, res) => {
   var obj = req.body;
 
@@ -40,18 +37,18 @@ router.post('/login', (req, res) => {
   pool.query(sql, [field, password], (err, result) => {
     if (err) throw err;
     //判断查询的结果（数组）长度是否大于0 大于0，说明查询到数据，有这个用户登录成功
-    let data = result[0]
-    delete data.password
-    let token = main.token.create(data)
 
     if (result.length > 0) {
+      let data = result[0]
+      delete data.password
+      let token = main.token.create(data)
       res.send({ code: 0, msg: '欢迎回家', data, token });
     } else {
       res.send({ code: 1, msg: '账号或密码错误' });
     }
   });
 });
-// 功能一、用户登录 ↑
+// 用户登录 ↑
 
 // 头像上传 ↓
 const upload = multer({ dest: 'upload/' }); // 1、创建multer对象 创建目录upload
@@ -83,7 +80,6 @@ router.post('/userPic/upload', upload.single('file'), (req, res) => { // 2、接
       pool.query(sql, [userId], (err, result) => {
         if (err) throw err;
 
-        
         if (result.length > 0) {
           let data = result[0].userPic
           picUrl = data
@@ -129,7 +125,7 @@ router.post('/userPic/upload', upload.single('file'), (req, res) => { // 2、接
 
   async function async () {
     await _getUserPic()
-    await _delUserPic()
+    if (picUrl) await _delUserPic() // 有旧头像文件则删除
     await _storage1()
     await _storage2()
   }
@@ -137,8 +133,7 @@ router.post('/userPic/upload', upload.single('file'), (req, res) => { // 2、接
 })
 // 头像上传 ↑
 
-
-// 功能六、通过token获取用户信息
+// 通过token获取用户信息
 router.get(`/getUserInfo`, (req, res) => {
   let userId = main.token.toUserId(req.headers.token)
   main.user.get(userId).then(data => {
@@ -150,8 +145,7 @@ router.get(`/getUserInfo`, (req, res) => {
   })
 })
 
-
-// 功能六、更改用户信息 ↓
+// 更改用户信息 ↓
 router.put('/setUserInfo', (req, res) => {
   var obj = req.body;
   let userId = main.token.toUserId(req.headers.token)
@@ -187,22 +181,79 @@ router.put('/setUserInfo', (req, res) => {
     }
   });
 });
-// 功能六、更改用户信息 ↑
+// 更改用户信息 ↑
 
+// 模糊搜索作者名
+router.get(`/authorName`, (req, res) => {
+  var obj = req.query;
+  let keyword = obj.keyword;
 
+  if (!keyword) {
+    res.send({ code: -1, msg: 'keyword不可为空' })
+    return
+  }
 
+  let sql = 'SELECT userId, userName FROM user_info WHERE userName LIKE ?'
 
+  pool.query(sql, ['%' + keyword + '%'], (err, data) => {
+    if (err) throw err;
+    if (data.length > 0) {
+      res.send({ code: 0, data });
+    } else {
+      res.send({ code: 1, msg: '没有搜索结果' , data});
+    }
+  });
+})
+// 模糊搜索作者名
 
+// 搜索作者
+router.get(`/author`, (req, res) => {
+  let obj = req.query;
+  let keyword = obj.keyword;
+  let userId = obj.userId;
+  if (!keyword) {
+    res.send({ code: -1, msg: 'keyword不可为空' })
+    return
+  }
 
+  let sql = ''
+  if (userId !== 'undefined') {
+    sql = 'SELECT * FROM user_info WHERE userId=?'
+    pool.query(sql, [userId], (err, data) => {
+      if (err) throw err;
+  
+      for (let i of data) {
+        delete i.email
+        delete i.password
+      }
+  
+      if (data.length > 0) {
+        res.send({ code: 0, data });
+      } else {
+        res.send({ code: 1, data, msg: '没有搜索结果'});
+      }
+    });
+  } else {
+    sql = 'SELECT * FROM user_info WHERE userName LIKE ?'
+    pool.query(sql, ['%' + keyword + '%'], (err, data) => {
+      if (err) throw err;
+  
+      for (let i of data) {
+        delete i.email
+        delete i.password
+      }
+  
+      if (data.length > 0) {
+        res.send({ code: 0, data });
+      } else {
+        res.send({ code: 1, data, msg: '没有搜索结果'});
+      }
+    });
+  }
+})
+// 搜索作者
 
-// ------------------目前用到的 ↑↑↑↑↑ 目前用到的 ↑↑↑↑↑ 目前用到的 ↑↑↑↑↑ 目前用到的--------------------------------------
-// ------------------目前用到的 ↑↑↑↑↑ 目前用到的 ↑↑↑↑↑ 目前用到的 ↑↑↑↑↑ 目前用到的--------------------------------------
-// ------------------目前用到的 ↑↑↑↑↑ 目前用到的 ↑↑↑↑↑ 目前用到的 ↑↑↑↑↑ 目前用到的--------------------------------------
-// ------------------目前用到的 ↑↑↑↑↑ 目前用到的 ↑↑↑↑↑ 目前用到的 ↑↑↑↑↑ 目前用到的--------------------------------------
-
-
-
-// 功能二、检测 昵称 邮箱 手机 是否注册 ↓
+// 检测 昵称 邮箱 手机 是否注册 ↓
 router.get('/checkUserNamePhoneEmail', (req, res) => {
   var obj = req.query;
   var field = obj.field;
@@ -215,7 +266,6 @@ router.get('/checkUserNamePhoneEmail', (req, res) => {
 
   let sql = ''
   let infoField = ''
-
   if (main.reg.email.test(field)) {
     sql = 'SELECT * FROM user_info WHERE email=?'
     infoField = '邮箱'
@@ -227,7 +277,7 @@ router.get('/checkUserNamePhoneEmail', (req, res) => {
     infoField = '昵称'
   }
 
-  if (userId) sql += ` AND userId=?`
+  if (userId) sql += ` AND userId!=?`
 
   pool.query(sql, [field, userId], (err, result) => {
     if (err) throw err;
@@ -239,39 +289,36 @@ router.get('/checkUserNamePhoneEmail', (req, res) => {
     }
   })
 });
-// 功能二、检测 昵称 邮箱 手机 是否注册 ↑
+// 检测 昵称 邮箱 手机 是否注册 ↑
 
-
-// 功能三、用户注册 ↓
+// 用户注册 ↓
 router.post('/register', (req, res) => {
   var obj = req.body; //获取post请求的数据
 
   var userName = obj.userName; //判断用户名是否为空
+  var password = obj.password; //验证密码、邮箱、手机是否为空
+  var email = obj.email;
+  // var phone = obj.phone;
+
   if (!userName) {
     res.send({ code: -1, msg: 'userName 不可为空' });
     return;
   }
-
-  var password = obj.password; //验证密码、邮箱、手机是否为空
   if (!password) {
     res.send({ code: -1, msg: 'password 不可为空' });
     return;
   }
-
-  var email = obj.email;
   if (!email) {
     res.send({ code: -1, msg: 'email 不可为空' });
     return;
   }
-
-  var phone = obj.phone;
-  if (!phone) {
-    res.send({ code: -1, msg: 'phone 不可为空' });
-    return;
-  }
+  // if (!phone) {
+  //   res.send({ code: -1, msg: 'phone 不可为空' });
+  //   return;
+  // }
 
   //执行SQL语句，将注册的数据插入到user_info数据表中，成功响应 {code:200,msg:'register suc'}
-  pool.query('INSERT INTO user_info SET userName=?,password=md5(?),email=?,phone=?', [userName, password, email, phone], (err, result) => {
+  pool.query('INSERT INTO user_info SET userName=?,password=md5(?),email=?,sex=0', [userName, password, email], (err, result) => {
     if (err) throw err;
 
     //是否添加成功
@@ -283,10 +330,9 @@ router.post('/register', (req, res) => {
   });
 
 });
-// 功能三、用户注册 ↑
+// 用户注册 ↑
 
-
-// 功能四、获取验证码 ↓
+// 获取验证码 ↓
 router.get('/verificationCode', (req, res) => {
   var obj = req.query;
   var field = obj.field;
@@ -323,15 +369,27 @@ router.get('/verificationCode', (req, res) => {
     res.send({ code: 1, msg: '手机或邮箱格式不正确'})
   }
 })
-// 功能四、获取验证码 ↑
+// 获取验证码 ↑
 
-
-// 功能五、忘记密码 ↓
+// 忘记密码 ↓
 router.put('/forgetPassword', (req, res) => {
   var obj = req.body; //获取post请求的数据
   var field = obj.field; //手机或邮箱
   var password = obj.password; //新密码
   var verificationCode = obj.verificationCode
+
+  if (!field) {
+    res.send({ code: -1, msg: 'field 不可为空' });
+    return;
+  }
+  if (!password) {
+    res.send({ code: -1, msg: 'password 不可为空' });
+    return;
+  }
+  if (!verificationCode) {
+    res.send({ code: -1, msg: 'verificationCode 不可为空' });
+    return;
+  }
 
   // 封装 更新函数
   var update = function (field, password) {
@@ -355,22 +413,8 @@ router.put('/forgetPassword', (req, res) => {
     })
   }
 
-  if (!field) {
-    res.send({ code: -1, msg: 'field 不可为空' });
-    return;
-  }
-  if (!password) {
-    res.send({ code: -1, msg: 'password 不可为空' });
-    return;
-  }
-  if (!verificationCode) {
-    res.send({ code: -1, msg: 'verificationCode 不可为空' });
-    return;
-  }
-
   main.verificationCode.vali(field).then(resolve => {
     if (resolve.valid === true) {
-      // console.log(resolve.result[0].verificationCode, verificationCode, resolve.result[0].verificationCode.toUpperCase(), verificationCode.toUpperCase())
       if (!resolve.result[0].verificationCode) {
         res.send({ code: -1, msg: '验证码已过期' })
         return
@@ -385,157 +429,25 @@ router.put('/forgetPassword', (req, res) => {
     }
   })
 })
-// 功能五、忘记密码 ↑
+// 忘记密码 ↑
 
-
-
-
-
-
-
-
-// 分割线----------------------分割线----------------------分割线----------------------分割线----------------------分割线----------------------分割线
-
-
-
-
-
-
-// 功能七、修改密码 ↓
-router.post('/setupwd', (req, res) => {
-  var obj = req.body;
-
-  var $uid = obj.uid;                      //验证数据是否为空
-  var $supwd = obj.supwd;          //原密码
-  var $upwd = obj.upwd;            //新密码
-  if (!$uid) {
-    res.send({ code: 401, msg: '昵称不能为空' });
-    return;
-  }
-  if (!$supwd) {
-    res.send({ code: 402, msg: '原密码不能为空' });
-    return;
-  }
-  if (!$upwd) {
-    res.send({ code: 403, msg: '新密码不能为空' });
-    return;
-  }
-
-  //封装验证函数↓
-  function verify () {
-    return new Promise(
-      function (open, er) {
-
-        //执行SQL语句，查询原密码是否正确
-        pool.query('SELECT * FROM user_info WHERE uid=? AND upwd=md5(?)', [$uid, $supwd], (err, result) => {
-          if (err) throw err;
-          //判断查询的结果（数组）长度是否大于0
-          //如果大于0，说明查询到数据，有这个用户登录成功
-          // console.log('查询结果------------'+result)
-          if (result.length > 0) {
-            // res.send({code:200,msg:'查到对应账户，验证通过'});
-            open();
-          } else {
-            er('err原密码错误');
-            res.send({ code: 301, msg: '原密码错误' });
-          }
-        });
-
-      }
-    )
-  }
-  //封装更改密码函数↓
-  function update () {
-    return new Promise(
-      function (open, er) {
-        //执行SQl语句修改密码
-        pool.query("UPDATE user_info SET upwd=MD5(?) WHERE uid=?", [$upwd, $uid], (err, result) => {
-          if (err) throw err;
-          // console.log('查询结果------------'+result);
-          //判断是否更改成功
-          if (result.affectedRows > 0) {
-            open();
-            res.send({ code: 200, msg: '密码修改成功 φ(゜▽゜*)♪' });
-          } else {
-            er('err密码修改失败');
-            res.send({ code: 302, msg: '密码修改失败 X﹏X' });
-          }
-        });
-
-      }
-    )
-  }
-
-  (async function () {
-    try {
-      await verify();
-      await update();
-    } catch (errMsg) {
-      console.log(errMsg);
-    }
-  })();
-
-});
-// 功能七、修改密码 ↑
-
-
-// 功能八、获取用户头像链接↓
-router.get('/pic', (req, res) => {
-  var obj = req.query;//获取get请求的数据
-  //判断是否为空
-  var $uid = obj.uid;
-  if (!$uid) {
-    res.send({ code: 401, msg: "uid 不能为空 ( ´ﾟДﾟ`)" });
-    return;
-  }
-
-  var sql = 'SELECT pic FROM `user_info` WHERE uid=?'
-  pool.query(sql, [$uid], (err, result) => {
-    if (err) throw err;
-    //如何判断是否检索到了用户
-    //判断结果（数组）长度是否大于0
-    if (result.length > 0) {
-      res.send({ code: 200, msg: result[0] });
-    } else {
-      res.send({ code: 301, msg: '没有找到该用户 Σ(*ﾟдﾟﾉ)ﾉ' });
-    }
-  })
-
-});
-// 功能八、获取用户头像链接↑
-
-// 功能九、用户检索接口 —— 用户信息修改/管理页面的用户原信息↓
-router.get('/detail', (req, res) => {
-  //获取get请求的数据
+// 获取该用户有多少纸条
+router.get('/authorPaperStripCount', (req, res) => {
   var obj = req.query;
-  //获取请求用户的UID
-  var $uid = obj.uid;
-  //非空检查
-  if (!$uid) {
-    res.send({ code: 401, msg: 'uid 不能为空，请尝试重新登录' });
+  var userId = obj.userId;
+  if (!userId) {
+    res.send({ code: -1, msg: 'userId 不可为空' });
     return;
   }
-  //响应查询到的用户对象
-  pool.query('SELECT `email`, `phone`, `uname`, `occupation`, `city`, `gender` FROM user_info WHERE uid=?', [$uid], (err, result) => {
-    if (err) throw err;
-    //如何判断是否检索到了用户
-    //判断结果（数组长度是否大于0）
-    if (result.length > 0) {
 
-      res.send({ code: 200, msg: result[0] });
-    } else {
-      res.send({ code: 301, msg: '没找到该用户，请重新登录(○´･д･)ﾉ' });
-    }
+  let sql = 'SELECT count(paperStripId) AS paperStripCount FROM paper_strip WHERE userId=?'
+  pool.query(sql, userId, (err, result) => {
+    if (err) throw err;
+
+    let data = result[0].paperStripCount
+    res.send({ code: 1, data })
   })
 })
-// 功能九、用户检索接口 —— 用户信息修改/管理页面的用户原信息↑
-
-
-
-//分割线----------------------分割线----------------------分割线----------------------分割线----------------------分割线----------------------分割线
-
-
-
 
 //导出路由器
 module.exports = router;

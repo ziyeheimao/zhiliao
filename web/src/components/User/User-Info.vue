@@ -1,11 +1,11 @@
 <template>
   <el-form :model="form" :rules="rules" ref="form">
     <el-form-item prop="userName">
-      <el-input clearable placeholder="昵称" v-model="form.userName"></el-input>
+      <el-input clearable placeholder="昵称" v-model="form.userName" @blur="checkUserNamePhoneEmail(form.userName, 'userName')"></el-input>
     </el-form-item>
 
     <el-form-item prop="email">
-      <el-input clearable placeholder="电子邮箱" v-model="form.email"></el-input>
+      <el-input clearable placeholder="电子邮箱" v-model="form.email" @blur="checkUserNamePhoneEmail(form.email, 'email')" :disabled='true'></el-input>
     </el-form-item>
 
     <el-form-item prop="password">
@@ -64,7 +64,9 @@ export default {
         password: [
           { required: true, message: '密码不可为空', trigger: 'blur' },
           { min: 1, max: 20, message: '密码在1到20位之间', trigger: 'blur' }
-        ]
+        ],
+        isUserName: true,
+        isEmail: true
       }
 
     }
@@ -77,13 +79,48 @@ export default {
     },
 
     // 修改个人信息
-    setUserInfo (form) {
+    setUserInfo: async function (form) {
+      await this.checkUserNamePhoneEmail(this.form.userName, 'userName')
+      await this.checkUserNamePhoneEmail(this.form.email, 'email')
+      await this._setUserInfo(form)
+    },
+    _setUserInfo: async function (form) {
       this.$refs[form].validate(valid => {
-        if (valid) {
+        if (valid * this.rules.isUserName * this.rules.isEmail) {
           api.setUserInfo(this.form).then(({data}) => {
             main.msg(data.code, data.msg)
           })
         }
+      })
+    },
+
+    // 检测 昵称 手机 邮箱 是否已被占用
+    checkUserNamePhoneEmail (value, type) {
+      if (value === '') return
+      return new Promise((resolve, reject) => {
+        let data = { field: value, userId: this.User.userId }
+        api.checkUserNamePhoneEmail(data, 1).then(({data}) => {
+          if (main.msg(data.code, data.msg)) {
+            switch (type) {
+              case 'userName':
+                this.rules.isUserName = true
+                break
+              case 'email':
+                this.rules.isEmail = true
+                break
+            }
+          } else {
+            switch (type) {
+              case 'userName':
+                this.rules.isUserName = false
+                break
+              case 'email':
+                this.rules.isEmail = false
+                break
+            }
+          }
+          resolve()
+        })
       })
     }
   },

@@ -1,9 +1,7 @@
 <template>
   <section class="ctn">
     <!-- logo -->
-    <div class="logo">
-      <img src="../../assets/img/logo1.png" alt="logo" height="50px" style="padding-left:20px;">
-    </div>
+    <Logo></Logo>
 
     <!-- 搜索 -->
     <div class="search-box">
@@ -54,9 +52,12 @@
 import api from '@api'
 import main from '@main'
 import User from './User'
+import Logo from './Logo'
+
 export default {
   components: {
-    User
+    User,
+    Logo
   },
   // props: [''],
   computed: {

@@ -12,11 +12,11 @@
           <h1 class="title">{{ctnData.title}}</h1>
 
           <div class="info">
-            <el-link type="primary" @click="findUser(ctnData.userId)">{{ctnData.userName}}</el-link>
+            <el-link type="primary" @click="findUser(ctnData)">{{ctnData.userName}}</el-link><!-- 作者 -->
             <el-link type="primary" :underline="false">{{ctnData.releaseTime | dateTimetrans}}</el-link>
 
-            <el-link type="success" @click="beforeupDataPaperStrip">修改内容</el-link>
-            <el-link type="danger" @click="delDialogVisible = true">删除</el-link>
+            <el-link type="success" @click="beforeupDataPaperStrip" v-if="ctnData.userId === User.userId">修改内容</el-link>
+            <el-link type="danger" @click="delDialogVisible = true" v-if="ctnData.userId === User.userId">删除</el-link>
           </div>
 
           <div class="ctn" v-html="ctnData.content" v-highlight></div>
@@ -26,7 +26,7 @@
         <el-dialog
           title="删除纸条"
           :visible.sync="delDialogVisible"
-          width="450px"
+          :width="width > 768 ? '450px' : '80%'"
           append-to-body>
 
           <span>确定要删除该纸条吗?</span>
@@ -147,8 +147,13 @@ export default {
       })
     },
     // 跳转查询用户页面,通过userId 获取 该用户的所有纸条
-    findUser (userId) {
-      console.log(userId)
+    findUser (user) {
+      this.$router.push({
+        name: `FindUser`,
+        query: {
+          userName: user.userName, userId: user.userId
+        }
+      })
     },
 
     // 删除纸条

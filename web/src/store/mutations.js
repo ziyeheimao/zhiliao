@@ -6,14 +6,14 @@ const mutations = {
   SToken: (state, data) => {
     state.Token = data
   },
-  SRefresh: (state, data) => {
-    state.Refresh = data
-  },
   SUser: (state, data) => {
     state.User = data
   },
   SSearchCondition: (state, data) => { // 搜索条件
     state.SearchCondition = data
+  },
+  SSearchAuthorName: (state, data) => { // 上次搜索的作者名字
+    state.SearchAuthorName = data
   },
   SListdata: (state, data) => { // 搜索结果数据
     state.Listdata = data
@@ -23,6 +23,9 @@ const mutations = {
   },
   SRefreshUserInfo: (state, data) => { // 刷新用户信息
     state.RefreshUserInfo = data
+  },
+  SFindUserList: (state, data) => {
+    state.FindUserList = data // 模糊搜索的用户信息列表
   }
 }
 

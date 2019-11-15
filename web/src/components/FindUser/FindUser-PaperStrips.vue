@@ -1,0 +1,106 @@
+<template>
+  <div>
+    <ul v-if='paperStrip.length !== 0' class="list">
+      <li v-for="(v, k) in paperStrip" :key="k" @click="details(v)">
+        <h4>{{v.title}}</h4>
+
+        <div class="time">
+          <output>{{v.releaseTime | dateTimetrans}}</output>
+        </div>
+
+        <p v-html="v.content"></p>
+      </li>
+    </ul>
+  </div>
+</template>
+
+<script>
+import api from '@api'
+// import main from '@main'
+
+export default {
+  components: {
+    // x
+  },
+  props: {
+    UserId: {
+      type: Number, // 非实时派发scroll事件和位置参数, 类型由0,1,2,3,
+      default: 0
+    }
+  },
+  computed: {
+
+  },
+  data () {
+    return {
+      paperStrip: []
+    }
+  },
+  methods: {
+    findPaperStripByUserId () {
+      if (!this.UserId) return
+      api.findPaperStripByUserId(this.UserId).then(({data}) => {
+        this.paperStrip = data.data
+      })
+    },
+    details (v) {
+      let paperStripId = v.paperStripId
+      this.$store.commit('SPaperStripId', paperStripId)
+
+      let _paperStripId = JSON.stringify(paperStripId) // 对象转json字符串
+      window.sessionStorage.setItem('paperStripId', _paperStripId)
+
+      let data = { keyword: v.title }
+      let searchCondition = JSON.stringify(data) // 对象转json字符串
+      window.sessionStorage.setItem('searchCondition', searchCondition)
+      this.$store.commit('SSearchCondition', data)
+
+      this.$router.push('/details')
+    }
+  },
+  beforeCreate () {},
+  created () {
+    this.findPaperStripByUserId()
+  },
+  beforeMount () {},
+  mounted () {},
+  beforeUpdate () {},
+  updated () {},
+  beforeDestroy () {},
+  deactivated () {},
+  watch: {
+    UserId () {
+      this.findPaperStripByUserId()
+    }
+  }
+
+}
+</script>
+
+<style lang='scss' scoped>
+@import '@style/index.scss';
+.list{
+  & > li{
+    margin: 15px 0;
+    padding: 15px;
+    cursor: pointer;
+    &>h4{
+      font-size: 1.3rem;
+      @include overflow-ellipsis;
+    }
+    &>div.time{
+      text-align: right;
+    }
+    &>p{
+      text-indent: 2rem;
+      @include Overflow-ellipsis(3)
+    }
+  }
+  & > li ~ li {
+    border-top: 1px solid #ccc;
+  }
+  & > li:hover{
+    background-color: rgb(224, 255, 228);
+  }
+}
+</style>

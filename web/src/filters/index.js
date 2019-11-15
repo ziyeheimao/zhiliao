@@ -35,3 +35,16 @@ exports.dateTimetrans = (date2) => {
   var s = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()) // 秒
   return Y + M + D + h + m + s
 }
+
+// 性别
+exports.sex = (data) => {
+  let sex = ''
+  if (data === 1) {
+    sex = '♂'
+  } else if (data === 2) {
+    sex = '♀'
+  } else {
+    sex = ''
+  }
+  return sex
+}
