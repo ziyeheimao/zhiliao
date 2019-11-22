@@ -65,9 +65,9 @@ CREATE TABLE paper_strip(
     userId INT,                                             #用户id
     userName VARCHAR(32),                                   #用户昵称
     title VARCHAR(128) NOT NULL,                            #标题
-    content VARCHAR(10240) NOT NULL,                        #内容
-    keyword VARCHAR(256),                                   #关键词
-    coverMap VARCHAR(512),                                  #封面图片链接
+    content VARCHAR(419430400) NOT NULL,                    #内容 最大50MB 含base64图片
+    keyword VARCHAR(1024),                                  #关键词
+    coverMap VARCHAR(1024),                                 #封面图片链接
     releaseTime BIGINT NOT NULL,                            #发布时间 时间戳 -- var timestamp=new Date().getTime()；
     FOREIGN KEY(userId) REFERENCES user_info(userId)        #外键
     -- FOREIGN KEY(userName) REFERENCES user_info(userName)    #外键

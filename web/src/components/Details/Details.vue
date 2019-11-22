@@ -141,7 +141,11 @@ export default {
       delDialogVisible: false,
       delPaperStripId: '', // 将被删除的纸条id
 
-      upDataDialogVisible: false // 修改
+      upDataDialogVisible: false, // 修改
+
+      imgList: [
+        // { name: '[图片1]', value: 'base64 .......' }
+      ] // base64图片数据
     }
   },
   methods: {
@@ -178,11 +182,40 @@ export default {
     // 进入修改页面之前处理字符串
     beforeupDataPaperStrip () {
       this.ctnData.content = main.H5ToStr(this.ctnData.content)
+
+      // base64图片转图片标记
+      this.base64ToSign()
+
       this.upDataDialogVisible = true
+    },
+    // base64图片转图片标记
+    base64ToSign () {
+      let reg = /<img signStart='' src='[^>]+' style='max-width: 100%;' signEnd=''>/g
+      let reg2 = /<img signStart='' src='[^>]+' style='max-width: 100%;' signEnd=''>/
+      let arr = this.ctnData.content.match(reg)
+      this.imgList = []
+      for (let i = 0; i < arr.length; i++) {
+        // 缓存base64
+        this.imgList.push({ name: `[图片${i + 1}]`, value: arr[i] })
+        // 替换base64
+        this.ctnData.content = this.ctnData.content.replace(reg2, `[图片${i + 1}]`)
+      }
+    },
+    // 图片标记转base64
+    signToBase64 () {
+      for (let i of this.imgList) { // 替换图片名称字符串为base64
+        if (this.ctnData.content.indexOf(i.name) !== -1) {
+          this.ctnData.content = this.ctnData.content.replace(i.name, i.value)
+        }
+      }
     },
     // 取消修改时
     cancel () {
       this.ctnData.content = main.strToH5(this.ctnData.content)
+
+      // 图片标记转base64
+      this.signToBase64()
+
       this.upDataDialogVisible = false
     },
     // 修改纸条
@@ -190,6 +223,10 @@ export default {
       this.$refs[ctnData].validate(valid => {
         if (valid) {
           this.ctnData.userName = this.User.userName
+
+          // 图片标记转base64
+          this.signToBase64()
+
           api.upDataPaperStrip(this.ctnData).then(({data}) => {
             if (main.msg(data.code, data.msg)) {
               this.upDataDialogVisible = false

@@ -56,7 +56,10 @@ server.use(express.static('public'));
 // server.use(bodyParser.urlencoded({ // 解析原生表单 post请求主体数据
 //   extnded: false // 使用querystring解析数据
 // }));
-server.use(bodyParser.json()); // 解析axios(json格式) post请求主体数据
+
+server.use(bodyParser.json({
+  limit : '50mb' // 限制post请求大小为50MB, 用于base64数据传输
+})); // 解析axios(json格式) post请求主体数据
 
 server.use('/user', user); // 用户模块
 server.use('/ctn', ctn); // 内容模块

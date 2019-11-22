@@ -11,17 +11,7 @@ const multer = require('multer');        // 文件上传
 var router = express.Router();           // 创建空路由
 
 
-/*
-跨表分页查询
-`select * from web INNER JOIN class_details ON fk_wid=wid`  //跨表查询 排除笛卡尔积后 的全部数据
-`SELECT * FROM web INNER JOIN class_details ON fk_wid=wid WHERE class_details.uid=1 AND class_details.cid=1`       //对结果进行条件uid cid（安右侧class_details）过滤之后的数据
-`SELECT * FROM web INNER JOIN class_details ON fk_wid=wid WHERE class_details.uid=1 AND class_details.cid=1 LIMIT 0,1`    //多表查询+条件过滤+分页 需要四个条件过滤：uid cid 分页：当前页 最大页
-*/
-
-
-
-// --------------------------------------------- ↓↓↓↓↓↓↓↓↓ --------------------------------------------------------
-// 通过搜索标题形成热词
+// 通过搜索标题形成热词 ↓
 router.get(`/getHotWords`, (req, res) => {
   let obj = req.query;
   let keyword = obj.keyword;
@@ -32,8 +22,9 @@ router.get(`/getHotWords`, (req, res) => {
     res.send({ code: 0, data })
   })
 })
+// 通过搜索标题形成热词 ↑
 
-// 标题 + 正文 + 关键字 广泛搜索
+// 标题 + 正文 + 关键字 + 作者 广泛搜索 ↓
 router.post(`/widelySearch`, (req, res) => {
   let obj = req.body;
   let keyword = obj.keyword;
@@ -129,9 +120,100 @@ router.post(`/widelySearch`, (req, res) => {
       break
   }
 })
+// 标题 + 正文 + 关键字 + 作者 广泛搜索 ↑
 
 
-// 通过纸条Id获取纸条信息
+// 模糊搜索作者名搜索热词辅助 ↓
+router.get(`/authorName`, (req, res) => {
+  var obj = req.query;
+  let keyword = obj.keyword;
+
+  if (!keyword) {
+    res.send({ code: -1, msg: 'keyword不可为空' })
+    return
+  }
+
+  let sql = 'SELECT userId, userName FROM user_info WHERE userName LIKE ?'
+
+  pool.query(sql, ['%' + keyword + '%'], (err, data) => {
+    if (err) throw err;
+    if (data.length > 0) {
+      res.send({ code: 0, data });
+    } else {
+      res.send({ code: 1, msg: '没有搜索结果' , data});
+    }
+  });
+})
+// 模糊搜索作者名搜索热词辅助 ↑
+
+// 搜索作者 ↓
+router.get(`/author`, (req, res) => {
+  let obj = req.query;
+  let keyword = obj.keyword;
+  let userId = obj.userId;
+  if (!keyword) {
+    res.send({ code: -1, msg: 'keyword不可为空' })
+    return
+  }
+
+  let sql = ''
+  if (userId !== 'undefined') {
+    sql = 'SELECT * FROM user_info WHERE userId=?'
+    pool.query(sql, [userId], (err, data) => {
+      if (err) throw err;
+  
+      for (let i of data) {
+        delete i.email
+        delete i.password
+      }
+  
+      if (data.length > 0) {
+        res.send({ code: 0, data });
+      } else {
+        res.send({ code: 1, data, msg: '没有搜索结果'});
+      }
+    });
+  } else {
+    sql = 'SELECT * FROM user_info WHERE userName LIKE ?'
+    pool.query(sql, ['%' + keyword + '%'], (err, data) => {
+      if (err) throw err;
+  
+      for (let i of data) {
+        delete i.email
+        delete i.password
+      }
+  
+      if (data.length > 0) {
+        res.send({ code: 0, data });
+      } else {
+        res.send({ code: 1, data, msg: '没有搜索结果'});
+      }
+    });
+  }
+})
+// 搜索作者 ↑
+
+// 获取该用户有多少纸条 ↓
+router.get('/authorPaperStripCount', (req, res) => {
+  var obj = req.query;
+  var userId = obj.userId;
+  if (!userId) {
+    res.send({ code: -1, msg: 'userId 不可为空' });
+    return;
+  }
+
+  let sql = 'SELECT count(paperStripId) AS paperStripCount FROM paper_strip WHERE userId=?'
+  pool.query(sql, userId, (err, result) => {
+    if (err) throw err;
+
+    let data = result[0].paperStripCount
+    res.send({ code: 1, data })
+  })
+})
+// 获取该用户有多少纸条 ↑
+
+
+// 通过纸条Id获取纸条信息 ↓
 router.get(`/paperStrip`, (req, res) => {
   let obj = req.query;
   let paperStripId = obj.paperStripId;
@@ -147,8 +229,9 @@ router.get(`/paperStrip`, (req, res) => {
     res.send({ code: 0, data })
   })
 })
+// 通过纸条Id获取纸条信息 ↑
 
-// 发布纸条
+// 发布纸条 ↓
 router.post(`/releasePaperStrip`, (req, res) => {
   let obj = req.body;
   let userId = main.token.toUserId(req.headers.token)
@@ -181,8 +264,9 @@ router.post(`/releasePaperStrip`, (req, res) => {
     }
   });
 })
+// 发布纸条 ↑
 
-// 删除纸条
+// 删除纸条 ↓
 router.delete(`/delPaperStrip`, (req, res) => {
   let obj = req.query;
   let paperStripId = obj.paperStripId; // 纸条id
@@ -203,8 +287,9 @@ router.delete(`/delPaperStrip`, (req, res) => {
     }
   })
 })
+// 删除纸条 ↑
 
-// 修改纸条
+// 修改纸条 ↓
 router.put(`/upDataPaperStrip`, (req, res) => {
   let obj = req.body;
 
@@ -214,7 +299,6 @@ router.put(`/upDataPaperStrip`, (req, res) => {
   let title = obj.title;
   let content = obj.content;
   let keyword = obj.keyword;
-  let releaseTime = new Date().getTime(); // 时间戳
 
   if (!paperStripId) {
     res.send({ code: -1, msg: '纸条Id不可为空' });
@@ -234,9 +318,9 @@ router.put(`/upDataPaperStrip`, (req, res) => {
   }
 
   //执行SQL语句
-  let sql = 'UPDATE paper_strip SET userName=?, title=?, content=?, keyword=?, releaseTime=? WHERE userId=? AND paperStripId=?'
+  let sql = 'UPDATE paper_strip SET userName=?, title=?, content=?, keyword=? WHERE userId=? AND paperStripId=?'
 
-  pool.query(sql, [userName, title, content, keyword, releaseTime, userId, paperStripId], (err, result) => {
+  pool.query(sql, [userName, title, content, keyword, userId, paperStripId], (err, result) => {
     if (err) throw err;
 
     if (result.affectedRows > 0) { // 判断是否更改成功
@@ -246,8 +330,10 @@ router.put(`/upDataPaperStrip`, (req, res) => {
     }
   });
 })
+// 修改纸条 ↑
 
-// 通过用户id获取该用户所有纸条
+
+// 通过用户id获取该用户所有纸条 ↓
 router.get(`/findPaperStripByUserId`, (req, res) => {
   let obj = req.query;
   let userId = Number(obj.userId);
@@ -263,5 +349,14 @@ router.get(`/findPaperStripByUserId`, (req, res) => {
     res.send({ code: 0, data })
   })
 })
+// 通过用户id获取该用户所有纸条 ↑
+
+/*
+跨表分页查询
+`select * from web INNER JOIN class_details ON fk_wid=wid`  //跨表查询 排除笛卡尔积后 的全部数据
+`SELECT * FROM web INNER JOIN class_details ON fk_wid=wid WHERE class_details.uid=1 AND class_details.cid=1`       //对结果进行条件uid cid（安右侧class_details）过滤之后的数据
+`SELECT * FROM web INNER JOIN class_details ON fk_wid=wid WHERE class_details.uid=1 AND class_details.cid=1 LIMIT 0,1`    //多表查询+条件过滤+分页 需要四个条件过滤：uid cid 分页：当前页 最大页
+*/
+
 //导出路由器
 module.exports = router;

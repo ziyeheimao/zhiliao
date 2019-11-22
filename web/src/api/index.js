@@ -34,16 +34,6 @@ export default {
     return axios.put(`/user/setUserInfo`, data)
   },
 
-  // 搜索作者名时搜索 辅助
-  authorName (keyword) {
-    return axios.get(`/user/authorName?keyword=${keyword}`)
-  },
-
-  // 搜索作者
-  author (data) {
-    return axios.get(`/user/author?keyword=${data.keyword}&userId=${data.userId}`)
-  },
-
   // 获取验证码
   verificationCode (field) {
     return axios.get(`/user/verificationCode?field=${field}`)
@@ -52,11 +42,6 @@ export default {
   // 忘记密码
   forgetPassword (data) {
     return axios.put(`/user/forgetPassword`, data)
-  },
-
-  // 获取某个用户的纸条数量
-  authorPaperStripCount (userId) {
-    return axios.get(`/user/authorPaperStripCount?userId=${userId}`)
   },
   // -------------------------------------------------用户↑-----------------------------------------------------
 
@@ -82,6 +67,21 @@ export default {
   widelySearch (data) {
     if (!data.type) return axios.post(`/ctn/widelySearch`, data)
     else return axios.post(`/ctn/widelySearch`, data)
+  },
+
+  // 搜索作者名时搜索 辅助
+  authorName (keyword) {
+    return axios.get(`/ctn/authorName?keyword=${keyword}`)
+  },
+
+  // 搜索作者
+  author (data) {
+    return axios.get(`/ctn/author?keyword=${data.keyword}&userId=${data.userId}`)
+  },
+
+  // 获取某个用户的纸条数量
+  authorPaperStripCount (userId) {
+    return axios.get(`/ctn/authorPaperStripCount?userId=${userId}`)
   },
 
   // 通过Id 获取纸条(帖子)

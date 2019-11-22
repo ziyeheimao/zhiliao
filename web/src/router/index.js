@@ -18,7 +18,7 @@ const Index = resolve => {
   })
 }
 
-// List
+// 搜索列表
 const List = resolve => {
   require.ensure(['@components/List/List.vue'], () => {
     resolve(require('@components/List/List.vue'))
@@ -38,10 +38,10 @@ const User = resolve => {
   })
 }
 
-// 猜你喜欢
+// 发布纸条
 const PaperStrip = resolve => {
-  require.ensure(['@components/PaperStrip/PaperStrip.vue'], () => {
-    resolve(require('@components/PaperStrip/PaperStrip.vue'))
+  require.ensure(['@components/PaperStrip/PaperStrip2.vue'], () => {
+    resolve(require('@components/PaperStrip/PaperStrip2.vue'))
   })
 }
 
@@ -52,7 +52,7 @@ const FindUser = resolve => {
   })
 }
 
-// 刷新 空页面
+// 刷新空页面
 const Blank = resolve => {
   require.ensure(['@components/Blank/Blank.vue'], () => {
     resolve(require('@components/Blank/Blank.vue'))
