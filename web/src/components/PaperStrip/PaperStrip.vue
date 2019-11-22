@@ -15,8 +15,22 @@
               <el-input clearable placeholder="标题" v-model="form.title"></el-input>
             </el-form-item>
 
+            <div class="toolbar">
+              <el-link type="primary" icon='el-icon-picture' :underline="false"
+                @click="toolbar('pic')">插入图片</el-link>
+
+              <el-divider direction="vertical"></el-divider>
+
+              <el-link type="primary" icon='el-icon-picture-outline-round' :underline="false" disabled>插入表情</el-link>
+
+              <el-divider direction="vertical"></el-divider>
+
+              <el-link type="primary" icon='el-icon-upload' :underline="false" disabled>上传文件</el-link>
+
+            </div>
+
             <el-form-item prop="content">
-              <el-input clearable placeholder="记录你的生活 分享你的快乐~" v-model="form.content"
+              <el-input clearable placeholder="记录生活 分享快乐~" v-model="form.content"
                 type='textarea' :rows="20"></el-input>
             </el-form-item>
 
@@ -28,6 +42,10 @@
               <el-button type='primary' @click="releasePaperStrip('form')">发 布</el-button>
             </el-form-item>
           </el-form>
+
+          <div class="toolbar-file-input-box">
+            <input type="file" id="insertPic">
+          </div>
         </el-main>
 
         <el-aside :width="width > 1440 ? '200px' : '100px'" v-show="width > 992"></el-aside>
@@ -70,6 +88,7 @@ export default {
         ],
         keyword: []
       },
+
       form: {
         userName: '',
         title: '',
@@ -93,6 +112,16 @@ export default {
           })
         }
       })
+    },
+    // 点击工具栏内工具
+    toolbar (name) {
+      switch (name) {
+        case 'pic': // 插入图片
+          document.getElementById('insertPic').click()
+          break
+        case '':
+          break
+      }
     }
   },
   beforeCreate () {},
@@ -127,5 +156,20 @@ export default {
 }
 .btn .el-button{
   width: 100%;
+}
+
+// 工具栏
+.toolbar {
+  border-radius: 3px;
+  margin-bottom: 8px;
+  padding: 8px 15px;
+  background-color: #fff;
+  border: 1px solid #DCDFE6;
+}
+// 工具栏input
+.toolbar-file-input-box{
+  width: 0;
+  height: 0;
+  overflow: hidden;
 }
 </style>

@@ -5,7 +5,9 @@ import {Message} from 'element-ui'
 
 // 设置全局axios默认值
 axios.defaults.timeout = 10000 // 10000的超时验证
-axios.defaults.baseURL = 'http://127.0.0.1:666'
+axios.defaults.baseURL = 'http://127.0.0.1:80' // 服务器地址
+// axios.defaults.baseURL = 'http://929b537c.ngrok.io:80' // 内网穿透地址
+
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8'
 // axios.defaults.headers.post['Content-Type'] = 'x-www-form-urlencoded'
 

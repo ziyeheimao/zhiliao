@@ -34,7 +34,7 @@
 
         </ul>
       </div>
-      <el-radio-group v-model="type">
+      <el-radio-group v-model="type" v-if="width > 768">
         <el-radio :label="0">全部</el-radio>
         <el-radio :label="1">标题</el-radio>
         <el-radio :label="2">正文</el-radio>
@@ -63,6 +63,13 @@ export default {
   computed: {
     SearchCondition () {
       return this.$store.getters.SearchCondition
+    },
+    width () {
+      return this.$store.getters.InnerSize.width
+    },
+    inputWidth () {
+      if (this.width > 768) return '450px;' // 搜索栏&搜索辅助宽度
+      else return '100%;'
     }
   },
   data () {
@@ -74,7 +81,7 @@ export default {
         hotWords: []
       },
 
-      inputWidth: 450, // 搜索栏&搜索辅助宽度
+      // inputWidth: 450, // 搜索栏&搜索辅助宽度
       timer: null, // 节流
       activateIndex: -1, // 当前激活颜色的选项
       mode: false, // 关键词模式 true搜索历史(显示关闭的x) false热词(不显示关闭的x)

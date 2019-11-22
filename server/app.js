@@ -10,14 +10,16 @@ const main = require('./main.js')
 // 路由
 const user = require('./routes/user.js'); // 用户模块
 const ctn = require('./routes/ctn.js'); // 内容模块
-// const ctn = require('./routes/ctn.js'); // 管理模块
+// const admin = require('./routes/admin.js'); // 管理模块
 const other = require('./routes/other.js'); // 其它接口
 
 
 // 创建web服务器
-var server = express();
-server.listen(main.serverPort, function () {
-  console.log(`web服务器创建成功,端口${main.serverPort}（づ￣3￣）づ╭❤～`);
+const server = express();
+const app = server.listen(main.serverPort, function () {
+  var host = app.address().address
+  var port = app.address().port
+  console.log(`服务器创建成功,端口 ${port} （づ￣3￣）づ╭❤～`);
 })
 
 // 跨域白名单配置
@@ -56,11 +58,7 @@ server.use(express.static('public'));
 // }));
 server.use(bodyParser.json()); // 解析axios(json格式) post请求主体数据
 
-// 中间件
-// server.use(main.middleware.token) // 自定义中间件 token
-// server.use(main.middleware.power) // 自定义中间件 权限
-
 server.use('/user', user); // 用户模块
 server.use('/ctn', ctn); // 内容模块
-// server.use('/ctn', ctn); // 管理模块
+// server.use('/admin', admin); // 管理模块
 server.use('/other', other); // 其它接口

@@ -23,12 +23,14 @@ export default {
     }
   },
   data () {
-    return {}
+    return {
+      time: null
+    }
   },
   methods: {},
   beforeCreate () {},
   created () {
-    setTimeout(() => {
+    this.time = setTimeout(() => {
       this.$router.push('/')
     }, 3000)
   },
@@ -36,7 +38,9 @@ export default {
   mounted () {},
   beforeUpdate () {},
   updated () {},
-  beforeDestroy () {},
+  beforeDestroy () {
+    clearTimeout(this.time)
+  },
   deactivated () {},
   watch: {}
 }

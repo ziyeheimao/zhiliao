@@ -4,7 +4,7 @@
     <el-input
       id="searchInput"
       clearable
-      :style="'width:' + inputWidth + 'px;'"
+      :style="'width:' + inputWidth"
       class="input-with-select"
       placeholder="人傻才要多xiao习(๑•̀ㅂ•́)و✧"
 
@@ -17,7 +17,7 @@
     </el-input>
 
     <!-- 搜索辅助 -->
-    <ul :style="'width:' + inputWidth + 'px;' + isShow"
+    <ul :style="'width:' + inputWidth + isShow"
       class="hotWords" id="hotWords">
 
       <li v-for="(v, k) in res.hotWords" :key="k"
@@ -48,11 +48,17 @@ export default {
     },
     Token () {
       return this.$store.getters.Token
+    },
+    width () {
+      return this.$store.getters.InnerSize.width
+    },
+    inputWidth () {
+      if (this.width > 768) return '450px;' // 搜索栏&搜索辅助宽度
+      else return '100%;'
     }
   },
   data () {
     return {
-      inputWidth: 450, // 搜索栏&搜索辅助宽度
       keyword: '', // 搜索关键字
       userId: 'undefined',
       timer: null, // 节流

@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-header height='80px'>
+    <el-header height='80px' class="a">
       <Search></Search>
     </el-header>
 
@@ -9,6 +9,15 @@
 
       <el-main>
         <Ctn></Ctn>
+        <Backtop>
+          <div style="{
+            height: 40px; width: 40px;
+            text-align: center; line-height: 40px; color: #1989fa;
+            background-color: #f2f5f6; box-shadow: 0px 0px 6px #00000070;
+            border: 1px solid #eee; border-radius: 50%; font-size: 2rem; }">
+            <i class="el-icon-caret-top"></i>
+          </div>
+        </Backtop>
       </el-main>
 
       <el-aside :width="width > 1440 ? '200px' : '100px'" v-show="width > 992"></el-aside>
@@ -21,11 +30,13 @@
 // import main from '@main'
 import Search from '../Modular/Search'
 import Ctn from './List-Ctn'
+import Backtop from '../MyUI/Backtop'
 
 export default {
   components: {
     Search,
-    Ctn
+    Ctn,
+    Backtop
   },
   // props: [''],
   computed: {

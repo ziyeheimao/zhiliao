@@ -19,7 +19,16 @@
             <el-link type="danger" @click="delDialogVisible = true" v-if="ctnData.userId === User.userId">删除</el-link>
           </div>
 
-          <div class="ctn" v-html="ctnData.content" v-highlight></div>
+          <!-- <div class="ctn" v-html="ctnData.content" v-highlight></div> -->
+          <div class="ctn" v-html="ctnData.content" v-highlight v-if="ctnData.content.indexOf('type=html') === -1"></div>
+          <div class="ctn" v-highlight v-if="ctnData.content.indexOf('type=html') !== -1">
+            <pre>
+              <code>
+                {{ctnData.content}}
+              </code>
+            </pre>
+          </div>
+
         </div>
 
         <!-- 删除 -->
@@ -55,7 +64,7 @@
                 </el-form-item>
 
                 <el-form-item prop="content">
-                  <el-input clearable placeholder="记录你的生活 分享你的快乐~" v-model="ctnData.content"
+                  <el-input clearable placeholder="记录生活 分享快乐~" v-model="ctnData.content"
                     type='textarea' :rows="20"></el-input>
                 </el-form-item>
 
@@ -256,8 +265,10 @@ export default {
     }
   }
 }
-.el-dialog .btn{
-  text-align: right;
-}
 
+.el-dialog {
+  .btn{
+    text-align: right;
+  }
+}
 </style>

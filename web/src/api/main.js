@@ -4,7 +4,9 @@ import Vue from 'vue'
 // import FileSaver from '@static/js/FileSaver.js' // 文件转码
 const vue = new Vue()
 
-const serverUrl = 'http://127.0.0.1:666' // 服务器地址
+const serverUrl = 'http://127.0.0.1:80' // 服务器地址
+// const serverUrl = 'http://929b537c.ngrok.io:80' // 内网穿透地址
+
 // const defaultPic = 'http://127.0.0.1:666/static/userPic/defaultPic.png' // 默认头像
 
 // 去掉空格（两种方法都可以）

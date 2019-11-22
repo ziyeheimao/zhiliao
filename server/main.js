@@ -1,7 +1,7 @@
 const pool = require('./pool.js'); // 数据库 连接池
 
 const serverIp = 'http://127.0.0.1' // 后端服务器ip
-const serverPort = 666 // 服务器端口
+const serverPort = 80 // 服务器端口
 
 const DBHost = '127.0.0.1' // 数据库ip
 const corsHost = ['http://127.0.0.1', 'http://localhost'] // 跨域白名单 ip 域名
@@ -210,7 +210,7 @@ const token = {
 
 // 时间
 const date = {
-  // 时间戳转 时间格式
+  // 时间格式转换
   timetrans: function (date) {
     var date = new Date(date);                                                                     // 转时间类型
     var Y = date.getFullYear() + '-';                                                              // 年

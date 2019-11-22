@@ -12,11 +12,12 @@ var router = express.Router();           // 创建空路由
 
 
 /*
+跨表分页查询
 `select * from web INNER JOIN class_details ON fk_wid=wid`  //跨表查询 排除笛卡尔积后 的全部数据
 `SELECT * FROM web INNER JOIN class_details ON fk_wid=wid WHERE class_details.uid=1 AND class_details.cid=1`       //对结果进行条件uid cid（安右侧class_details）过滤之后的数据
 `SELECT * FROM web INNER JOIN class_details ON fk_wid=wid WHERE class_details.uid=1 AND class_details.cid=1 LIMIT 0,1`    //多表查询+条件过滤+分页 需要四个条件过滤：uid cid 分页：当前页 最大页
 */
-// 功能八、分类的分页、多表查询↑
+
 
 
 // --------------------------------------------- ↓↓↓↓↓↓↓↓↓ --------------------------------------------------------
