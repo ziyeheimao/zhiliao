@@ -40,7 +40,7 @@ export default {
     findPaperStripByUserId () {
       if (!this.UserId) return
       api.findPaperStripByUserId(this.UserId).then(({data}) => {
-        this.paperStrip = data.data
+        this.paperStrip = data.data.reverse()
       })
     },
     details (v) {

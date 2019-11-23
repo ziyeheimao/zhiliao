@@ -19,9 +19,8 @@
             <el-link type="danger" @click="delDialogVisible = true" v-if="ctnData.userId === User.userId">删除</el-link>
           </div>
 
-          <!-- <div class="ctn" v-html="ctnData.content" v-highlight></div> -->
-          <div class="ctn" v-html="ctnData.content" v-highlight v-if="ctnData.content.indexOf('type=html') === -1"></div>
-          <div class="ctn" v-highlight v-if="ctnData.content.indexOf('type=html') !== -1">
+          <div class="ctn" v-html="ctnData.content" v-if="ctnData.languageSign.toUpperCase().indexOf('HTML') === -1" v-highlight></div>
+          <div class="ctn" v-if="ctnData.languageSign.toUpperCase().indexOf('HTML') !== -1" v-highlight>
             <pre>
               <code>
                 {{ctnData.content}}
@@ -63,6 +62,19 @@
                   <el-input clearable placeholder="标题" v-model="ctnData.title"></el-input>
                 </el-form-item>
 
+                <div class="toolbar">
+                  <el-link type="primary" icon='el-icon-picture' :underline="false"
+                    @click="toolbar('pic')">插入图片</el-link>
+
+                  <el-divider direction="vertical"></el-divider>
+
+                  <el-link type="primary" icon='el-icon-picture-outline-round' :underline="false" disabled>插入表情</el-link>
+
+                  <el-divider direction="vertical"></el-divider>
+
+                  <el-link type="primary" icon='el-icon-upload' :underline="false" disabled>上传文件</el-link>
+                </div>
+
                 <el-form-item prop="content">
                   <el-input clearable placeholder="记录生活 分享快乐~" v-model="ctnData.content"
                     type='textarea' :rows="20"></el-input>
@@ -72,12 +84,31 @@
                   <el-input clearable placeholder="关键词 多个时可用空格隔开" v-model="ctnData.keyword"></el-input>
                 </el-form-item>
 
+                <el-form-item prop="languageSign">
+                  <el-input clearable placeholder="语言标记 如若内容含HTML标签必须标记 其它语言随意" v-model="ctnData.languageSign"></el-input>
+                </el-form-item>
+
                 <el-form-item class="btn">
                   <el-button @click="cancel">取 消</el-button>
                   <el-button type='primary' @click="upDataPaperStrip('ctnData')">修 改</el-button>
                 </el-form-item>
 
               </el-form>
+
+              <!-- 上传图片用 -->
+              <div class="toolbar-file-input-box">
+                <input type="file" id="insertPic"  @change="insertPic">
+              </div>
+
+              <Backtop>
+                <div style="{
+                  height: 40px; width: 40px;
+                  text-align: center; line-height: 40px; color: #1989fa;
+                  background-color: #f2f5f6; box-shadow: 0px 0px 6px #00000070;
+                  border: 1px solid #eee; border-radius: 50%; font-size: 2rem; }">
+                  <i class="el-icon-caret-top"></i>
+                </div>
+              </Backtop>
             </el-main>
 
             <el-aside :width="width > 1440 ? '200px' : '100px'" v-show="width > 992"></el-aside>
@@ -95,10 +126,12 @@
 import api from '@api'
 import main from '@main'
 import Search from '../Modular/Search'
+import Backtop from '../MyUI/Backtop'
 
 export default {
   components: {
-    Search
+    Search,
+    Backtop
   },
   // props: [''],
   computed: {
@@ -117,6 +150,7 @@ export default {
   },
   data () {
     return {
+      // contentSegmentation: [], // 内容分段 纸条内容为html代码时特殊处理
       ctnData: {
         userId: '',
         userName: '',
@@ -125,7 +159,8 @@ export default {
         keyword: '',
         paperStripId: '',
         releaseTime: '',
-        coverMap: '' // 封图
+        coverMap: '', // 封图
+        languageSign: '' // 语言标记
       },
       rules: {
         title: [
@@ -155,7 +190,12 @@ export default {
       api.paperStrip(this.PaperStripId).then(({data}) => {
         if (data.code === 0) {
           this.ctnData = data.data
-          this.ctnData.content = main.strToH5(this.ctnData.content)
+
+          if (this.ctnData.languageSign.toUpperCase().indexOf('HTML') === -1) { // 帖子不包含内容html则转码
+            this.ctnData.content = main.strToH5(this.ctnData.content)
+          } else { // 否则克隆后分段
+
+          }
         }
       })
     },
@@ -181,8 +221,9 @@ export default {
 
     // 进入修改页面之前处理字符串
     beforeupDataPaperStrip () {
-      this.ctnData.content = main.H5ToStr(this.ctnData.content)
-
+      if (this.ctnData.languageSign.toUpperCase().indexOf('HTML') === -1) { // 帖子不包含内容html则转码
+        this.ctnData.content = main.H5ToStr(this.ctnData.content)
+      }
       // base64图片转图片标记
       this.base64ToSign()
 
@@ -192,7 +233,7 @@ export default {
     base64ToSign () {
       let reg = /<img signStart='' src='[^>]+' style='max-width: 100%;' signEnd=''>/g
       let reg2 = /<img signStart='' src='[^>]+' style='max-width: 100%;' signEnd=''>/
-      let arr = this.ctnData.content.match(reg)
+      let arr = this.ctnData.content.match(reg) || []
       this.imgList = []
       for (let i = 0; i < arr.length; i++) {
         // 缓存base64
@@ -211,7 +252,9 @@ export default {
     },
     // 取消修改时
     cancel () {
-      this.ctnData.content = main.strToH5(this.ctnData.content)
+      if (this.ctnData.languageSign.toUpperCase().indexOf('HTML') === -1) { // 帖子不包含内容html则转码
+        this.ctnData.content = main.strToH5(this.ctnData.content)
+      }
 
       // 图片标记转base64
       this.signToBase64()
@@ -235,6 +278,54 @@ export default {
           })
         }
       })
+    },
+    // 点击工具栏内工具
+    toolbar (name) {
+      switch (name) {
+        case 'pic': // 插入图片
+          document.getElementById('insertPic').click()
+          break
+        case '':
+          break
+      }
+    },
+    // 图片选择时 添加
+    insertPic (e) {
+      // 检测图片格式和尺寸
+      let img = e.target.files[0]
+
+      let type = img.type
+      let size = img.size
+      let name = img.name
+
+      let valid = function (type, size) {
+        if (type.indexOf('image/') === -1) {
+          main.openWarningInfo('只能上传图片格式')
+          return false
+        }
+
+        if (size / 1024 / 1024 > 5) {
+          main.openWarningInfo('图片大小不能超过5M')
+          return false
+        }
+
+        return true
+      }
+
+      if (!valid(type, size)) return
+
+      // 处理图片
+      let reader = new FileReader() // 创建一个reader
+      reader.readAsDataURL(img) // 转码base64格式
+
+      reader.onloadend = () => { // 监听转码结束之后执行的回调函数
+        let nameStr = `[图片: ${name}]`
+        this.ctnData.content += `\n${nameStr}\n` // 文本框中只显示 [图片: 文件名.png]
+        this.imgList.push({
+          name: nameStr,
+          value: `<img signStart='' src='${reader.result}' style='max-width: 100%;' signEnd=''>`
+        }) // base64 数据存内存 发布的时候在导出来
+      }
     }
   },
   beforeCreate () {},
@@ -308,4 +399,7 @@ export default {
     text-align: right;
   }
 }
+
+// 工具栏
+@import '@style/toolbar.scss';
 </style>

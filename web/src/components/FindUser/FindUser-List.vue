@@ -9,7 +9,7 @@
           <li v-for="(v, k) in FindUserList" :key="k" @click="activate(v, k)"
             :class="activateIndex === k ? 'activate' : ''">
             <div class="pic">
-              <el-avatar :size="85" :src="v.userPic" style="margin-top: 10px;"></el-avatar>
+              <el-avatar :size="85" :src="v.userPic ? v.userPic : '../../../static/img/noHead.png'" style="margin-top: 10px;"></el-avatar>
             </div>
 
             <div class="info">

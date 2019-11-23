@@ -1,6 +1,6 @@
 <template>
   <div class="user">
-    <el-avatar :size="45" :src="userPic"></el-avatar>
+    <el-avatar :size="45" :src="userPic" style="border: 1px solid #ddd;"></el-avatar>
 
     <ul>
       <li v-if="!Token" @click="dialogVisible = true">登录 / 注册</li>
@@ -103,7 +103,12 @@ export default {
       return this.$store.getters.User
     },
     userPic () {
-      return this.$store.getters.User.userPic ? this.$store.getters.User.userPic : '../../../static/img/userPic.png'
+      if (this.Token) {
+        if (this.$store.getters.User.userPic) return this.$store.getters.User.userPic
+        else return '../../../static/img/noHead.png'
+      } else {
+        return '../../../static/img/userPic.png'
+      }
     },
     width () {
       return this.$store.getters.InnerSize.width

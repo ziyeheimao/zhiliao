@@ -4,4 +4,12 @@ pre {
 }
 code {
   border-radius: 5px;
+  /* overflow: scroll !important; */
+  overflow-y: scroll !important;
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important;  /* IE 10+ */
+}
+code::-webkit-scrollbar,body::-webkit-scrollbar { /* WebKit */
+  width: 0 !important;
+  height: 0 !important;
 }

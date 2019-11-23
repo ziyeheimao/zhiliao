@@ -1,7 +1,7 @@
 <template>
   <div v-if='activate !== -1 && FindUserList.length !== 0' class="userData">
     <div class="pic">
-      <el-avatar :size="200" :src="FindUserList[activate].userPic" style="border: 2px solid #ddd; margin-top:12px;"></el-avatar>
+      <el-avatar :size="200" :src="FindUserList[activate].userPic ? FindUserList[activate].userPic : '../../../static/img/noHead.png'" style="border: 2px solid #ddd; margin-top:12px;"></el-avatar>
     </div>
 
     <div class="info">

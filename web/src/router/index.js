@@ -40,8 +40,8 @@ const User = resolve => {
 
 // 发布纸条
 const PaperStrip = resolve => {
-  require.ensure(['@components/PaperStrip/PaperStrip2.vue'], () => {
-    resolve(require('@components/PaperStrip/PaperStrip2.vue'))
+  require.ensure(['@components/PaperStrip/PaperStrip.vue'], () => {
+    resolve(require('@components/PaperStrip/PaperStrip.vue'))
   })
 }
 

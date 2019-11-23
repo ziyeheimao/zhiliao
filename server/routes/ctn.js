@@ -239,6 +239,9 @@ router.post(`/releasePaperStrip`, (req, res) => {
   let title = obj.title;
   let content = obj.content;
   let keyword = obj.keyword;
+  let languageSign = obj.languageSign;
+
+
   let releaseTime = new Date().getTime(); // 时间戳
 
   if (!userName) {
@@ -254,8 +257,8 @@ router.post(`/releasePaperStrip`, (req, res) => {
     return
   }
 
-  let sql = `INSERT INTO paper_strip VALUES (NULL,?,?,?,?,?,NULL,?)`;
-  pool.query(sql, [userId, userName, title, content, keyword, releaseTime], (err, result) => {
+  let sql = `INSERT INTO paper_strip VALUES (NULL,?,?,?,?,?,NULL,?,?)`;
+  pool.query(sql, [userId, userName, title, content, keyword, releaseTime, languageSign], (err, result) => {
     if (err) throw err;
     if (result.affectedRows > 0) {
       res.send({ code: 0, msg: '发帖成功 []~(￣▽￣)~*' });
@@ -299,6 +302,7 @@ router.put(`/upDataPaperStrip`, (req, res) => {
   let title = obj.title;
   let content = obj.content;
   let keyword = obj.keyword;
+  let languageSign = obj.languageSign;
 
   if (!paperStripId) {
     res.send({ code: -1, msg: '纸条Id不可为空' });
@@ -318,9 +322,9 @@ router.put(`/upDataPaperStrip`, (req, res) => {
   }
 
   //执行SQL语句
-  let sql = 'UPDATE paper_strip SET userName=?, title=?, content=?, keyword=? WHERE userId=? AND paperStripId=?'
+  let sql = 'UPDATE paper_strip SET userName=?, title=?, content=?, keyword=?, languageSign=? WHERE userId=? AND paperStripId=?'
 
-  pool.query(sql, [userName, title, content, keyword, userId, paperStripId], (err, result) => {
+  pool.query(sql, [userName, title, content, keyword, languageSign, userId, paperStripId], (err, result) => {
     if (err) throw err;
 
     if (result.affectedRows > 0) { // 判断是否更改成功
