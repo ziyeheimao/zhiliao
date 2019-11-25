@@ -169,10 +169,13 @@ export default {
   methods: {
     to (type) {
       if (type === 1) {
+        if (this.$route.path === '/user') return
         this.$router.push('/user')
       } else if (type === 2) {
+        if (this.$route.path === '/paperStrip') return
         this.$router.push('/paperStrip')
       } else if (type === 3) {
+        if (this.$route.path === '/findUser') return
         this.$router.push({
           name: `FindUser`,
           query: {

@@ -19,13 +19,9 @@
             <el-link type="danger" @click="delDialogVisible = true" v-if="ctnData.userId === User.userId">删除</el-link>
           </div>
 
-          <div class="ctn" v-html="ctnData.content" v-if="ctnData.languageSign.toUpperCase().indexOf('HTML') === -1" v-highlight></div>
-          <div class="ctn" v-if="ctnData.languageSign.toUpperCase().indexOf('HTML') !== -1" v-highlight>
-            <pre>
-              <code>
-                {{ctnData.content}}
-              </code>
-            </pre>
+          <div class="ctn" v-html="ctnData.content" v-if="ctnData.languageSign.indexOf(1) === -1" v-highlight></div>
+          <div class="ctn" v-if="ctnData.languageSign.indexOf(1) !== -1" v-highlight>
+            <pre><code>{{ctnData.content}}</code></pre>
           </div>
 
         </div>
@@ -85,7 +81,10 @@
                 </el-form-item>
 
                 <el-form-item prop="languageSign">
-                  <el-input clearable placeholder="语言标记 如若内容含HTML标签必须标记 其它语言随意" v-model="ctnData.languageSign"></el-input>
+                  <el-select class="language-sign-select" multiple clearable
+                    v-model="ctnData.languageSign" placeholder="语言标记 便于搜索和推荐 若内容含HTML标签必须标记">
+                    <el-option v-for="(v, k) in res.languageSign" :key="k" :label="v.name" :value="v.value"></el-option>
+                  </el-select>
                 </el-form-item>
 
                 <el-form-item class="btn">
@@ -160,7 +159,7 @@ export default {
         paperStripId: '',
         releaseTime: '',
         coverMap: '', // 封图
-        languageSign: '' // 语言标记
+        languageSign: [] // 语言标记
       },
       rules: {
         title: [
@@ -170,7 +169,10 @@ export default {
         content: [
           { required: true, message: '内容不可为空', trigger: 'blur' }
         ],
-        keyword: []
+        keyword: [],
+        languageSign: [
+          { required: true, message: '语言标记不可为空', trigger: 'blur' }
+        ]
       },
 
       delDialogVisible: false,
@@ -180,7 +182,11 @@ export default {
 
       imgList: [
         // { name: '[图片1]', value: 'base64 .......' }
-      ] // base64图片数据
+      ], // base64图片数据
+
+      res: {
+        languageSign: []
+      }
     }
   },
   methods: {
@@ -190,8 +196,8 @@ export default {
       api.paperStrip(this.PaperStripId).then(({data}) => {
         if (data.code === 0) {
           this.ctnData = data.data
-
-          if (this.ctnData.languageSign.toUpperCase().indexOf('HTML') === -1) { // 帖子不包含内容html则转码
+          this.ctnData.languageSign = JSON.parse(this.ctnData.languageSign)
+          if (this.ctnData.languageSign.indexOf(1) === -1) { // 帖子不包含内容html则转码
             this.ctnData.content = main.strToH5(this.ctnData.content)
           } else { // 否则克隆后分段
 
@@ -221,7 +227,7 @@ export default {
 
     // 进入修改页面之前处理字符串
     beforeupDataPaperStrip () {
-      if (this.ctnData.languageSign.toUpperCase().indexOf('HTML') === -1) { // 帖子不包含内容html则转码
+      if (this.ctnData.languageSign.indexOf(1) === -1) { // 帖子不包含内容html则转码
         this.ctnData.content = main.H5ToStr(this.ctnData.content)
       }
       // base64图片转图片标记
@@ -242,22 +248,21 @@ export default {
         this.ctnData.content = this.ctnData.content.replace(reg2, `[图片${i + 1}]`)
       }
     },
-    // 图片标记转base64
-    signToBase64 () {
-      for (let i of this.imgList) { // 替换图片名称字符串为base64
-        if (this.ctnData.content.indexOf(i.name) !== -1) {
-          this.ctnData.content = this.ctnData.content.replace(i.name, i.value)
-        }
-      }
-    },
+
     // 取消修改时
     cancel () {
-      if (this.ctnData.languageSign.toUpperCase().indexOf('HTML') === -1) { // 帖子不包含内容html则转码
+      if (this.ctnData.languageSign.indexOf(1) === -1) { // 帖子不包含内容html则转码
         this.ctnData.content = main.strToH5(this.ctnData.content)
       }
 
       // 图片标记转base64
-      this.signToBase64()
+      setTimeout(() => {
+        for (let i of this.imgList) { // 替换图片名称字符串为base64
+          if (this.ctnData.content.indexOf(i.name) !== -1) {
+            this.ctnData.content = this.ctnData.content.replace(i.name, i.value)
+          }
+        }
+      }, 100)
 
       this.upDataDialogVisible = false
     },
@@ -267,12 +272,19 @@ export default {
         if (valid) {
           this.ctnData.userName = this.User.userName
 
-          // 图片标记转base64
-          this.signToBase64()
+          // // 图片标记转base64
+          let reqData = main.clone(this.ctnData)
+          for (let i of this.imgList) { // 替换图片名称字符串为base64
+            if (reqData.content.indexOf(i.name) !== -1) {
+              reqData.content = reqData.content.replace(i.name, i.value)
+            }
+          }
+          reqData.languageSign = JSON.stringify(reqData.languageSign)
 
-          api.upDataPaperStrip(this.ctnData).then(({data}) => {
+          api.upDataPaperStrip(reqData).then(({data}) => {
             if (main.msg(data.code, data.msg)) {
               this.upDataDialogVisible = false
+              this.imgList = []
               this.$router.push('/list')
             }
           })
@@ -326,11 +338,21 @@ export default {
           value: `<img signStart='' src='${reader.result}' style='max-width: 100%;' signEnd=''>`
         }) // base64 数据存内存 发布的时候在导出来
       }
+    },
+
+    // 获取编程语言
+    language () {
+      api.language().then(({data}) => {
+        if (data.code === 0) {
+          this.res.languageSign = data.data
+        }
+      })
     }
   },
   beforeCreate () {},
   created () {
     this.paperStrip()
+    this.language()
   },
   beforeMount () {},
   mounted () {},
@@ -398,6 +420,10 @@ export default {
   .btn{
     text-align: right;
   }
+}
+
+.language-sign-select{
+  width: 100%;
 }
 
 // 工具栏

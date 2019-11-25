@@ -38,7 +38,10 @@
             </el-form-item>
 
             <el-form-item prop="languageSign">
-              <el-input clearable placeholder="语言标记 如若内容含HTML标签必须标记 其它语言随意" v-model="form.languageSign"></el-input>
+              <el-select class="language-sign-select" multiple clearable
+                v-model="form.languageSign" placeholder="语言标记 便于搜索和推荐 若内容含HTML标签必须标记">
+                <el-option v-for="(v, k) in res.languageSign" :key="k" :label="v.name" :value="v.value"></el-option>
+              </el-select>
             </el-form-item>
 
             <el-form-item class="btn">
@@ -90,7 +93,10 @@ export default {
         content: [
           { required: true, message: '内容不可为空', trigger: 'blur' }
         ],
-        keyword: []
+        keyword: [],
+        languageSign: [
+          { required: true, message: '语言标记不可为空', trigger: 'blur' }
+        ]
       },
 
       form: {
@@ -98,7 +104,40 @@ export default {
         title: '',
         content: '',
         keyword: '',
-        languageSign: '' // 语言标记
+        languageSign: [] // 语言标记
+      },
+      res: {
+        languageSign: [
+          // { name: 'HTML', value: 1 },
+          // { name: 'CSS', value: 2 },
+          // { name: 'JavaScript', value: 3 },
+          // { name: 'jQuery', value: 4 },
+          // { name: 'Vue', value: 5 },
+          // { name: 'React', value: 6 },
+          // { name: 'AngularJS', value: 7 },
+          // { name: 'Node.js', value: 8 },
+          // { name: 'MySQl', value: 9 },
+          // { name: 'ReactNative', value: 10 },
+          // { name: 'ionic', value: 11 },
+          // { name: 'Java', value: 12 },
+          // { name: 'PHP', value: 13 },
+          // { name: 'Android', value: 14 },
+          // { name: 'iOS', value: 15 },
+          // { name: '.NET', value: 16 },
+          // { name: 'Hadoop', value: 17 },
+          // { name: 'Python', value: 18 },
+          // { name: 'Delphi', value: 19 },
+          // { name: 'VB', value: 20 },
+          // { name: 'Perl', value: 21 },
+          // { name: 'Ruby', value: 22 },
+          // { name: 'Golang', value: 23 },
+          // { name: 'Erlang', value: 24 },
+          // { name: 'WP', value: 25 },
+          // { name: 'Flash', value: 26 },
+          // { name: 'C', value: 27 },
+          // { name: 'C++', value: 28 },
+          // { name: 'C#', value: 29 }
+        ]
       },
       imgList: [
         // { name: '[图片: 1.png]', value: 'base64 .......' }
@@ -112,17 +151,21 @@ export default {
         if (valid) {
           this.form.userName = this.User.userName
 
+          let reqData = main.clone(this.form)
+          reqData.languageSign = JSON.stringify(reqData.languageSign)
+
           for (let i of this.imgList) { // 替换图片名称字符串为base64
-            if (this.form.content.indexOf(i.name) !== -1) {
-              this.form.content = this.form.content.replace(i.name, i.value)
+            if (reqData.content.indexOf(i.name) !== -1) {
+              reqData.content = reqData.content.replace(i.name, i.value)
             }
           }
 
-          api.releasePaperStrip(this.form).then(({data}) => {
+          api.releasePaperStrip(reqData).then(({data}) => {
             if (main.msg(data.code, data.msg)) {
               this.form.title = ''
               this.form.content = ''
               this.form.keyword = ''
+              this.imgList = []
             }
           })
         }
@@ -181,10 +224,21 @@ export default {
           value: `<img signStart='' src='${reader.result}' style='max-width: 100%;' signEnd=''>`
         }) // base64 数据存内存 发布的时候在导出来
       }
+    },
+
+    // 获取编程语言
+    language () {
+      api.language().then(({data}) => {
+        if (data.code === 0) {
+          this.res.languageSign = data.data
+        }
+      })
     }
   },
   beforeCreate () {},
-  created () {},
+  created () {
+    this.language()
+  },
   beforeMount () {},
   mounted () {},
   beforeUpdate () {},
@@ -217,20 +271,9 @@ export default {
   width: 100%;
 }
 
+.language-sign-select{
+  width: 100%;
+}
 // 工具栏
 @import '@style/toolbar.scss';
-// // 工具栏
-// .toolbar {
-//   border-radius: 3px;
-//   margin-bottom: 8px;
-//   padding: 8px 15px;
-//   background-color: #fff;
-//   border: 1px solid #DCDFE6;
-// }
-// // 工具栏input
-// .toolbar-file-input-box{
-//   width: 0;
-//   height: 0;
-//   overflow: hidden;
-// }
 </style>

@@ -1,13 +1,12 @@
 <template>
   <el-container>
     <el-header>
-      <div class="logo">
-        <img src="../../assets/img/logo1.png" alt="logo" height="50px" style="padding-left:20px;">
-      </div>
+      <Logo></Logo>
+
       <User class="user"></User>
     </el-header>
 
-    <el-main>
+    <el-main class="ctn">
       <div class="search-box">
         <div class="logo">
           <img src="../../assets/img/logo2.png" alt="logo" height="65px">
@@ -16,8 +15,16 @@
         <Search></Search>
       </div>
 
-      <div class="newList" :style="'height:' + height + 'px;'">
+      <div class="news"
+        :style="'height:' + (width < 768 ? height - 25 : width < 1280 ? height - 70 : height - 100) + 'px;' +
+        (width < 768 ? 'padding: 25px 0 0;' : width < 1280 ? 'padding: 50px 20px 20px;' : 'padding: 80px 15% 20px;')">
+
+        <div class="change">
+          <el-link type="primary" @click="random = !random">换一换</el-link>
+        </div>
+
         <!-- 首页推荐列表 -->
+        <News :random='random'></News>
       </div>
     </el-main>
   </el-container>
@@ -27,25 +34,32 @@
 // import api from '@api'
 // import main from '@main'
 import Search from './Index-search'
+import News from './Index-news'
 import User from '../Modular/User'
+import Logo from '../Modular/Logo'
 
 export default {
   components: {
     Search,
-    User
+    News,
+    User,
+    Logo
   },
   // props: [''],
   computed: {
     height () {
       return this.$store.getters.InnerSize.height - 60 - 220
+    },
+    width () {
+      return this.$store.getters.InnerSize.width
     }
   },
   data () {
     return {
+      random: false
     }
   },
-  methods: {
-  },
+  methods: {},
   beforeCreate () {},
   created () {},
   beforeMount () {},
@@ -55,12 +69,14 @@ export default {
   beforeDestroy () {},
   deactivated () {},
   watch: {}
-
 }
 </script>
 
 <style lang='scss' scoped>
 @import '@style/index.scss';
+.ctn{
+  @include scrollHidden;
+}
 .search-box > .logo{
   text-align: center;
   font-size: 1.8rem;
@@ -77,8 +93,10 @@ export default {
 }
 
 // 新闻列表
-.newList{
-  // border: 1px solid red;
+.news{
+  .change{
+    padding: 0 10px 15px;
+    text-align: right;
+  }
 }
-
 </style>

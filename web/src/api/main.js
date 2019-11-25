@@ -9,6 +9,52 @@ const serverUrl = 'http://127.0.0.1:80' // 服务器地址
 
 // const defaultPic = 'http://127.0.0.1:666/static/userPic/defaultPic.png' // 默认头像
 
+// 克隆对象
+const clone = function (obj) {
+  let newObj = {}
+  for (let k in obj) {
+    newObj[k] = obj[k]
+  }
+  return newObj
+}
+
+const random = {// 随机
+  // 取两个数之间随机数
+  num: function (min = 0, max = 100, len = 0) {
+    return Number((min + (max - min) * Math.random()).toFixed(len))
+  },
+
+  // 任意长度 随机字符串
+  str: function (len = 8) {
+    let str = ''
+    let list = '0123456789abcdefghijklmnopqrstuvwxyz'
+    for (let i = 0; i < len; i++) {
+      let index = this.num(0, 35)
+      let word = list[index]
+      if (isNaN(word) && this.num() < 50) {
+        word = word.toUpperCase()
+      }
+      str += word
+    }
+    return str
+  },
+
+  // 随机字母
+  letter: function (len = 8) {
+    let str = ''
+    let list = 'abcdefghijklmnopqrstuvwxyz'
+    for (let i = 0; i < len; i++) {
+      let index = this.num(0, 26)
+      let word = list[index]
+      if (isNaN(word) && this.num() < 50) {
+        word = word.toUpperCase()
+      }
+      str += word
+    }
+    return str
+  }
+}
+
 // 去掉空格（两种方法都可以）
 const delSpace = function (str) {
   str = str.replace(/\+/g, '')
@@ -86,6 +132,8 @@ const H5ToStr = function (val) {
 // 导出
 export default {
   serverUrl,
+  random,
+  clone,
   delSpace,
   distinct,
   len,

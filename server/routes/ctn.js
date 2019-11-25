@@ -10,6 +10,33 @@ const multer = require('multer');        // 文件上传
 
 var router = express.Router();           // 创建空路由
 
+// 首页推荐列表
+router.post(`/news`, (req, res) => {
+  let obj = req.body;
+  let userId = null;
+  if (req.headers.token) userId = main.token.toUserId(req.headers.token);
+  let page = 1;
+  let limit = 90;
+  let time = new Date().getTime(); // 当前时间戳
+
+  // 如果 1用户登陆了登陆了 获取该用户所有纸条的语言类型并去重
+  //    获取除当前用户外的 日期在距今一周内所有(语言类型符合上述条件)的纸条 按点赞数排序取前30名send
+  if (userId) {
+    let sql = `SELECT * FROM paper_strip ORDER BY star DESC limit ?,?` // LIMIT ?,?
+    pool.query(sql, [(page - 1) * limit, limit], (err, data) => { // , page, limit
+      if (err) throw err;
+      res.send({ code: 0, data })
+    })
+    // res.send({ code: 1, msg: '登录后的推荐列表还在开发中' })
+  } else { // 否则 纸条表取 取点赞数排序前30名send
+    let sql = `SELECT * FROM paper_strip ORDER BY star DESC limit ?,?` // LIMIT ?,?
+    pool.query(sql, [(page - 1) * limit, limit], (err, data) => { // , page, limit
+      if (err) throw err;
+      res.send({ code: 0, data })
+    })
+  }
+})
+// 首页推荐列表
 
 // 通过搜索标题形成热词 ↓
 router.get(`/getHotWords`, (req, res) => {
@@ -122,7 +149,6 @@ router.post(`/widelySearch`, (req, res) => {
 })
 // 标题 + 正文 + 关键字 + 作者 广泛搜索 ↑
 
-
 // 模糊搜索作者名搜索热词辅助 ↓
 router.get(`/authorName`, (req, res) => {
   var obj = req.query;
@@ -212,7 +238,6 @@ router.get('/authorPaperStripCount', (req, res) => {
 })
 // 获取该用户有多少纸条 ↑
 
-
 // 通过纸条Id获取纸条信息 ↓
 router.get(`/paperStrip`, (req, res) => {
   let obj = req.query;
@@ -256,8 +281,12 @@ router.post(`/releasePaperStrip`, (req, res) => {
     res.send({ code: -1, msg: '内容不可为空' });
     return
   }
+  if (!languageSign) {
+    res.send({ code: -1, msg: '语言标记不可为空' });
+    return
+  }
 
-  let sql = `INSERT INTO paper_strip VALUES (NULL,?,?,?,?,?,NULL,?,?)`;
+  let sql = `INSERT INTO paper_strip VALUES (NULL,?,?,?,?,?,NULL,?,?,0,NULL)`;
   pool.query(sql, [userId, userName, title, content, keyword, releaseTime, languageSign], (err, result) => {
     if (err) throw err;
     if (result.affectedRows > 0) {
@@ -335,7 +364,6 @@ router.put(`/upDataPaperStrip`, (req, res) => {
   });
 })
 // 修改纸条 ↑
-
 
 // 通过用户id获取该用户所有纸条 ↓
 router.get(`/findPaperStripByUserId`, (req, res) => {

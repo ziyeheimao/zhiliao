@@ -106,12 +106,6 @@ export default {
 .list > li ~ li {
   margin-top: 10px;
 }
-.list{
-  li.null{
-    padding: 25px;
-    text-align: center;
-    font-size: 1.4rem;
-    color: #999;
-  }
-}
+
+@import '@style/null.scss';
 </style>

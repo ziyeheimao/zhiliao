@@ -13,6 +13,7 @@ export default {
   },
   methods: {
     toIndex () {
+      if (this.$route.path === '/') return
       this.$router.push('/')
     }
   }

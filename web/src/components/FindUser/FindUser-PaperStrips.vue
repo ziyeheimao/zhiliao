@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ul v-if='paperStrip.length !== 0' class="list">
+    <ul class="list">
       <li v-for="(v, k) in paperStrip" :key="k" @click="details(v)">
         <h4>{{v.title}}</h4>
 
@@ -10,6 +10,7 @@
 
         <p v-html="v.content"></p>
       </li>
+      <li class="null" v-if="paperStrip.length === 0">这家伙很懒 什么都没留下 (。_。)... </li>
     </ul>
   </div>
 </template>
@@ -102,5 +103,11 @@ export default {
   & > li:hover{
     background-color: rgb(224, 255, 228);
   }
+}
+
+@import '@style/null.scss';
+li.null{
+  border: 1px dashed #bbb;
+  background-color: #ffece0;
 }
 </style>

@@ -55,9 +55,18 @@ export default {
   occupation () {
     return axios.get(`/other/occupation`)
   },
+
+  language () {
+    return axios.get(`/other/language`)
+  },
   // -------------------------------------------------其它↑-----------------------------------------------------
 
   // -------------------------------------------------内容↓-----------------------------------------------------
+  // 推荐列表
+  news () {
+    return axios.post(`/ctn/news`)
+  },
+
   // 获取搜索热词
   getHotWords (keyword) {
     return axios.get(`/ctn/getHotWords?keyword=${keyword}`)

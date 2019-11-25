@@ -4,7 +4,7 @@ const main = require('../main.js');      // 工具类
 
 var router = express.Router();           // 创建空路由
 
-// 获取城市信息↓
+// 获取城市信息 ↓
 router.get('/regionInfo', (req, res) => {
   let regionInfo = [
     { "value": "110000", "label": "北京市", "children": [{ "value": "110100", "label": "北京城区", "children": [{ "value": "110101", "label": "东城区" }, { "value": "110102", "label": "西城区" }, { "value": "110105", "label": "朝阳区" }, { "value": "110106", "label": "丰台区" }, { "value": "110107", "label": "石景山区" }, { "value": "110108", "label": "海淀区" }, { "value": "110109", "label": "门头沟区" }, { "value": "110111", "label": "房山区" }, { "value": "110112", "label": "通州区" }, { "value": "110113", "label": "顺义区" }, { "value": "110114", "label": "昌平区" }, { "value": "110115", "label": "大兴区" }, { "value": "110116", "label": "怀柔区" }, { "value": "110117", "label": "平谷区" }, { "value": "110118", "label": "密云区" }, { "value": "110119", "label": "延庆区" }] }] },
@@ -713,11 +713,11 @@ router.get('/regionInfo', (req, res) => {
   ]
   res.send({ code: 0, data: regionInfo })
 })
-// 获取城市信息↑
+// 获取城市信息 ↑
 
 
-// 获取职业信息↓
-router.get('/occupation', (req,res) => {
+// 获取职业信息 ↓
+router.get('/occupation', (req, res) => {
   let occupation = [
     { "value": "001000000", "label": "生活 | 服务业", "children": [
         { "value": "001001000", "label": "餐饮", "children": [
@@ -1597,8 +1597,44 @@ router.get('/occupation', (req,res) => {
   ]
   res.send({ code: 0, data: occupation })
 })
-// 获取职业信息↑
+// 获取职业信息 ↑
 
+// 语言 ↓
+router.get(`/language`, (req, res) => {
+  let language = [
+    { name: 'HTML', value: 1 },
+    { name: 'CSS', value: 2 },
+    { name: 'JavaScript', value: 3 },
+    { name: 'jQuery', value: 4 },
+    { name: 'Vue', value: 5 },
+    { name: 'React', value: 6 },
+    { name: 'AngularJS', value: 7 },
+    { name: 'Node.js', value: 8 },
+    { name: 'MySQl', value: 9 },
+    { name: 'ReactNative', value: 10 },
+    { name: 'ionic', value: 11 },
+    { name: 'Java', value: 12 },
+    { name: 'PHP', value: 13 },
+    { name: 'Android', value: 14 },
+    { name: 'iOS', value: 15 },
+    { name: '.NET', value: 16 },
+    { name: 'Hadoop', value: 17 },
+    { name: 'Python', value: 18 },
+    { name: 'Delphi', value: 19 },
+    { name: 'VB', value: 20 },
+    { name: 'Perl', value: 21 },
+    { name: 'Ruby', value: 22 },
+    { name: 'Golang', value: 23 },
+    { name: 'Erlang', value: 24 },
+    { name: 'WP', value: 25 },
+    { name: 'Flash', value: 26 },
+    { name: 'C', value: 27 },
+    { name: 'C++', value: 28 },
+    { name: 'C#', value: 29 }
+  ]
+  res.send({ code: 0, data: language })
+})
+// 语言 ↑
 
 //导出路由器
 module.exports = router;
