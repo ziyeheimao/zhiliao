@@ -129,6 +129,75 @@ const H5ToStr = function (val) {
   val = val.replace(/<\/code><\/pre>/ig, '##') // 代码块替换
   return val
 }
+
+// 图片处理                元素     质量0-1        最大宽高           浮水印内容                 最小           文件最大体积
+const imgHandle = function (e, quality = 0.8, myWidth = 1024, ctnStr = '知了 (๑•̀ㅂ•́)و✧', minSize = 100, maxSize = 1024 * 1.5) { // 上传图片处理 1转码base64 2按比例缩放宽高到允许范围内 3压缩文件体积到的指定大小范围 4加浮水印
+  let base64 = e.target.result // 转码过后的base64编码
+  // console.log('压缩前', base64.length / 1024)
+  var newBase64 = null
+  // 创建一个图片
+  let newImage = new Image()
+  // let quality = 0.6 // 压缩系数0-1之间，压缩到0.9以上会有bug，注意！（可以自行设置）
+  newImage.src = base64
+  newImage.setAttribute('crossOrigin', 'Anonymous') // url为外域时需要 图片跨域？
+  let imgWidth, imgHeight
+
+  return new Promise((resolve, reject) => {
+    newImage.onload = function () {
+      imgWidth = this.width
+      imgHeight = this.height
+      // 给生成图片设置一个默认的最大宽/高（可以自行设置）
+      // let myWidth = 800
+
+      // 准备在画布上绘制图片
+      let canvas = document.createElement('canvas')
+      let ctx = canvas.getContext('2d')
+
+      // 判断上传的图片的宽高是否超过设置的默认最大值，以及设置同比例的宽高
+      if (Math.max(imgWidth, imgHeight) > myWidth) {
+        if (imgWidth > imgHeight) {
+          canvas.width = myWidth // 宽度直接赋值
+          canvas.height = myWidth * imgHeight / imgWidth // 高度按比例缩放
+        } else {
+          canvas.height = myWidth // 高度度直接赋值
+          canvas.width = myWidth * imgWidth / imgHeight // 宽度按比例缩放
+        }
+      } else {
+        canvas.width = imgWidth
+        canvas.height = imgHeight
+      }
+
+      // 清空画布
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      // 开始绘制图片到画布上
+      ctx.drawImage(this, 0, 0, canvas.width, canvas.height) // 图片画到画布上
+
+      // 绘制文字水印
+      ctx.font = '15px microsoft yahei'
+      ctx.fillStyle = 'rgba(255,255,255,0.7)'
+      // let ctnStr = '知了 (๑•̀ㅂ•́)و✧' // 浮水印内容
+      var ctnWidth = ctx.measureText(ctnStr).width // 计算文本宽度/返回文本宽度
+      ctx.fillText(ctnStr, canvas.width - ctnWidth - 10, canvas.height - 10) // 内容及绘制的坐标位置
+
+      newBase64 = canvas.toDataURL('image/jpeg', quality) // 压缩图片大小（关键代码）
+
+      // 获取到当前的图片的大小，然后调整成自己需要的大小，例如说需要200KB-500KB之间（可以自行设置）
+      while (newBase64.length / 1024 > maxSize) {
+        quality -= 0.02
+        newBase64 = canvas.toDataURL('image/jpeg', quality)
+      }
+
+      while (newBase64.length / 1024 < minSize && base64.length / 1024 > minSize) {
+        quality += 0.02
+        newBase64 = canvas.toDataURL('image/jpeg', quality)
+      }
+      // console.log('压缩后base64', newBase64.length / 1024)
+      // throw new Error(newBase64)
+      resolve(newBase64)
+    }
+  })
+}
+
 // 导出
 export default {
   serverUrl,
@@ -143,5 +212,6 @@ export default {
   openErrorInfo,
   msg,
   strToH5,
-  H5ToStr
+  H5ToStr,
+  imgHandle
 }

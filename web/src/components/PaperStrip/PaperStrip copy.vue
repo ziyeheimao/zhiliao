@@ -198,8 +198,8 @@ export default {
           return false
         }
 
-        if (size / 1024 / 1024 > 3) {
-          main.openWarningInfo('单个图片大小不能超过3M')
+        if (size / 1024 / 1024 > 5) {
+          main.openWarningInfo('图片大小不能超过5M')
           return false
         }
 
@@ -212,16 +212,13 @@ export default {
       let reader = new FileReader() // 创建一个reader
       reader.readAsDataURL(img) // 转码base64格式
 
-      reader.onloadend = (element) => { // 监听转码结束之后执行的回调函数
-        main.imgHandle(element, 0.8, 1280, '知了 (๑•̀ㅂ•́)و✧').then(base64 => {
-          let nameStr = `[图片: ${name}]`
-          this.form.content += `\n${nameStr}\n` // 文本框中只显示 [图片: 文件名.png]
-          this.imgList.push({
-            name: nameStr,
-            // reader.result // 原base64
-            value: `<img signStart='' src='${base64}' style='max-width: 100%;' signEnd=''>` // base64 数据存内存 发布的时候在导出来
-          })
-        })
+      reader.onloadend = () => { // 监听转码结束之后执行的回调函数
+        let nameStr = `[图片: ${name}]`
+        this.form.content += `\n${nameStr}\n` // 文本框中只显示 [图片: 文件名.png]
+        this.imgList.push({
+          name: nameStr,
+          value: `<img signStart='' src='${reader.result}' style='max-width: 100%;' signEnd=''>`
+        }) // base64 数据存内存 发布的时候在导出来
       }
     },
 

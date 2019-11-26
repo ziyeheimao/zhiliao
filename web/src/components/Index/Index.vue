@@ -74,29 +74,39 @@ export default {
 
 <style lang='scss' scoped>
 @import '@style/index.scss';
-.ctn{
-  @include scrollHidden;
-}
-.search-box > .logo{
-  text-align: center;
-  font-size: 1.8rem;
-}
-.search-box{
-  padding-top: 50px;
-}
-
 // 用户
 .el-header{
   @include flex-between-center;
   box-shadow: 2px 2px 5px #00000020;
   background-color: #fff;
+  position: relative;
+  z-index: 2;
 }
 
-// 新闻列表
-.news{
-  .change{
-    padding: 0 10px 15px;
-    text-align: right;
+.ctn{
+  position: relative;
+  z-index: 1;
+  @include scrollHidden;
+
+  &>.search-box{
+    padding-top: 50px;
+    position: relative;
+    z-index: 2;
+
+    &>.logo{
+      text-align: center;
+      font-size: 1.8rem;
+    }
+  }
+
+    // 新闻列表
+  & > .news{
+    position: relative;
+    z-index: 1;
+    & > .change{
+      padding: 0 10px 15px;
+      text-align: right;
+    }
   }
 }
 </style>
