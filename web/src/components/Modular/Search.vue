@@ -105,11 +105,12 @@ export default {
         }
         api.widelySearch(data).then(({data}) => {
           if (data.code === 0) this.$store.dispatch('AListdata', data.data)
+
+          this.cache()
+          this.isShow = 'display: none;' // 隐藏辅助
+          this.activateIndex = -1
+          document.getElementById('searchInput').blur() // 失去焦点
         })
-        this.cache()
-        this.isShow = 'display: none;' // 隐藏辅助
-        this.activateIndex = -1
-        document.getElementById('searchInput').blur() // 失去焦点
       }, 300)
       if (this.$route.name !== 'List') this.$router.push('./list')
     },

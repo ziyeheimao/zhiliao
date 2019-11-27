@@ -466,13 +466,12 @@ router.put('/star', (req, res) => {
       let arr = JSON.parse(paperStrip.starUserId)
       if (!arr.length) arr = [] // 防止arr 不是函数的情况
       let index = arr.indexOf(userId)
-
-      let sql = 'UPDATE paper_strip SET starUserId=? star=? WHERE paperStripId=?'
+      let sql = 'UPDATE paper_strip SET starUserId=?, star=? WHERE paperStripId=?'
       if (index === -1) { // 点赞
         arr.push(userId)
         let JSONArr = JSON.stringify(arr)
-
-        pool.query(sql, [JSONArr, paperStripId, paperStrip.star + 1], (err, result) => {
+        let count = paperStrip.star + 1
+        pool.query(sql, [JSONArr, paperStripId, count], (err, result) => {
           if (err) throw err;
 
           if (result.affectedRows > 0) { // 判断是否更改成功
@@ -484,8 +483,8 @@ router.put('/star', (req, res) => {
       } else { // 取消点赞
         arr.splice(index, 1)
         let JSONArr = JSON.stringify(arr)
-
-        pool.query(sql, [JSONArr, paperStripId, paperStrip.star - 1], (err, result) => {
+        let count = paperStrip.star + 1
+        pool.query(sql, [JSONArr, paperStripId, count], (err, result) => {
           if (err) throw err;
 
           if (result.affectedRows > 0) { // 判断是否更改成功

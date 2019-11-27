@@ -200,7 +200,8 @@ export default {
 
       res: {
         languageSign: []
-      }
+      },
+      time: null
     }
   },
   methods: {
@@ -368,26 +369,29 @@ export default {
 
     // 点赞 取消点赞
     star (paperStrip) {
-      let data = { paperStripId: paperStrip.paperStripId }
-      api.star(data).then(({data}) => {
-        if (data.code === 0) {
-          // 前端视图
-          let arr = JSON.parse(paperStrip.starUserId)
-          if (!arr.length) arr = []
-          if (JSON.parse(paperStrip.starUserId).indexOf(this.User.userId) === -1) { // 赞
-            arr.push(this.User.userId)
-            paperStrip.star = paperStrip.star + 1
-          } else { // 取消赞
-            let index = arr.indexOf(this.User.userId)
-            arr.splice(index, 1)
-            paperStrip.star = paperStrip.star - 1
+      clearTimeout(this.time)
+      this.time = setTimeout(() => {
+        let data = { paperStripId: paperStrip.paperStripId }
+        api.star(data).then(({data}) => {
+          if (data.code === 0) {
+            // 前端视图
+            let arr = JSON.parse(paperStrip.starUserId)
+            if (!arr.length) arr = []
+            if (JSON.parse(paperStrip.starUserId).indexOf(this.User.userId) === -1) { // 赞
+              arr.push(this.User.userId)
+              paperStrip.star = paperStrip.star + 1
+            } else { // 取消赞
+              let index = arr.indexOf(this.User.userId)
+              arr.splice(index, 1)
+              paperStrip.star = paperStrip.star - 1
+            }
+            let JSONArr = JSON.stringify(arr)
+            paperStrip.starUserId = JSONArr
+          } else {
+            main.openWarningInfo(data.msg)
           }
-          let JSONArr = JSON.stringify(arr)
-          paperStrip.starUserId = JSONArr
-        } else {
-          main.openWarningInfo(data.msg)
-        }
-      })
+        })
+      }, 300)
     }
   },
   beforeCreate () {},
