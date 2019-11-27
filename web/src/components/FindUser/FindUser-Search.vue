@@ -13,7 +13,7 @@
       @focus="inputFocus"
       @blur="inputBlur">
 
-      <el-button slot="append" icon="el-icon-search" @click="search">查找作者</el-button>
+      <el-button slot="append" @click="search">查作者</el-button>
     </el-input>
 
     <!-- 搜索辅助 -->
@@ -216,7 +216,9 @@ export default {
       this.keyword = this.$route.query.userName
       this.userId = this.$route.query.userId
     }
-    this.author()
+    this.keyword = this.$route.query.userName || ''
+    // this.author()
+    this.search()
   },
   beforeMount () {},
   mounted () {},
@@ -227,6 +229,9 @@ export default {
   watch: {
     keyword () {
       this.userId = 'undefined'
+    },
+    '$route.query' () {
+      this.keyword = this.$route.query.userName
     }
   }
 

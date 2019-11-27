@@ -4,12 +4,24 @@
       <h4 class="title">{{v.title}}</h4>
 
       <p class="inif">
-        <el-link type="primary" @click.stop="findUser(v)">{{v.userName}}</el-link>
-        <el-link type="primary">{{v.releaseTime | dateTimetrans}}</el-link>
-        <el-link type="primary">赞: {{v.star}}</el-link>
+        <el-link type="primary" @click.stop="findUser(v)">
+          <output>{{v.userName}}</output>
+        </el-link>
+
+        <el-link type="primary" :underline="false">
+          <output>{{v.releaseTime | dateTimetrans}}</output>
+        </el-link>
+
+        <el-link type="primary" @click.stop="star(v)" :disabled='Token ? false : true'>
+          <output>{{JSON.parse(v.starUserId).indexOf(User.userId) === -1 ? '赞:' : '取消赞:'}} {{v.star}}</output>
+        </el-link>
       </p>
 
       <p class="ctn">{{v.content}}</p>
+    </li>
+
+    <li class="null" v-if='newsList.length===0'>
+      暂无内容
     </li>
   </ul>
 </template>
@@ -38,6 +50,12 @@ export default {
       if (this.width < 672) return 'grid-template-rows: repeat(6, 110px);'
       else if (this.width < 1010 && this.width >= 672) return 'grid-template-rows: repeat(3, 110px);'
       else return 'grid-template-rows: repeat(2, 110px);' // 900以上
+    },
+    User () {
+      return this.$store.getters.User
+    },
+    Token () {
+      return this.$store.getters.Token
     }
   },
   data () {
@@ -71,11 +89,37 @@ export default {
       this.$router.push('/details')
     },
     // 跳转作者
-    findUser (user) {
+    findUser (paperStrip) {
       this.$router.push({
         name: `FindUser`,
         query: {
-          userName: user.userName, userId: user.userId
+          userName: paperStrip.userName, userId: paperStrip.userId
+        }
+      })
+    },
+    // 点赞 取消点赞
+    star (paperStrip) {
+      let data = { paperStripId: paperStrip.paperStripId }
+
+      // 后端数据
+      api.star(data).then(({data}) => {
+        console.log(data)
+        if (data.code === 0) {
+          // 前端视图
+          let arr = JSON.parse(paperStrip.starUserId)
+          if (!arr.length) arr = []
+          if (JSON.parse(paperStrip.starUserId).indexOf(this.User.userId) === -1) { // 赞
+            arr.push(this.User.userId)
+            paperStrip.star = paperStrip.star + 1
+          } else { // 取消赞
+            let index = arr.indexOf(this.User.userId)
+            arr.splice(index, 1)
+            paperStrip.star = paperStrip.star - 1
+          }
+          let JSONArr = JSON.stringify(arr)
+          paperStrip.starUserId = JSONArr
+        } else {
+          main.openWarningInfo(data.msg)
         }
       })
     }
@@ -162,5 +206,12 @@ export default {
   &>li.card:hover{
     box-shadow: 0 0 10px #00000060;
   }
+}
+
+@import '@style/null.scss';
+.null{
+  border-radius: 3px;
+  box-shadow: 0 0 7px #00000040;
+  line-height: 65px;
 }
 </style>

@@ -12,8 +12,17 @@
           <h1 class="title">{{ctnData.title}}</h1>
 
           <div class="info">
-            <el-link type="primary" @click="findUser(ctnData)">{{ctnData.userName}}</el-link><!-- 作者 -->
-            <el-link type="primary" :underline="false">{{ctnData.releaseTime | dateTimetrans}}</el-link>
+            <el-link type="primary" @click="findUser(ctnData)">
+              <output>{{ctnData.userName}}</output>
+            </el-link><!-- 作者 -->
+
+            <el-link type="primary" :underline="false">
+              <output>{{ctnData.releaseTime | dateTimetrans}}</output>
+            </el-link>
+
+            <el-link type="primary" @click.stop="star(ctnData)" :disabled='Token ? false : true'>
+              <output>{{JSON.parse(ctnData.starUserId).indexOf(User.userId) === -1 ? '赞:' : '取消赞:'}} {{ctnData.star}}</output>
+            </el-link>
 
             <el-link type="success" @click="beforeupDataPaperStrip" v-if="ctnData.userId === User.userId">修改内容</el-link>
             <el-link type="danger" @click="delDialogVisible = true" v-if="ctnData.userId === User.userId">删除</el-link>
@@ -145,6 +154,9 @@ export default {
     },
     User () {
       return this.$store.getters.User
+    },
+    Token () {
+      return this.$store.getters.Token
     }
   },
   data () {
@@ -159,7 +171,9 @@ export default {
         paperStripId: '',
         releaseTime: '',
         coverMap: '', // 封图
-        languageSign: [] // 语言标记
+        languageSign: [], // 语言标记
+        star: '',
+        starUserId: '[]' // JSON 字符串
       },
       rules: {
         title: [
@@ -180,9 +194,9 @@ export default {
 
       upDataDialogVisible: false, // 修改
 
-      imgList: [
+      imgList: [ // base64图片数据
         // { name: '[图片1]', value: 'base64 .......' }
-      ], // base64图片数据
+      ],
 
       res: {
         languageSign: []
@@ -348,6 +362,30 @@ export default {
       api.language().then(({data}) => {
         if (data.code === 0) {
           this.res.languageSign = data.data
+        }
+      })
+    },
+
+    // 点赞 取消点赞
+    star (paperStrip) {
+      let data = { paperStripId: paperStrip.paperStripId }
+      api.star(data).then(({data}) => {
+        if (data.code === 0) {
+          // 前端视图
+          let arr = JSON.parse(paperStrip.starUserId)
+          if (!arr.length) arr = []
+          if (JSON.parse(paperStrip.starUserId).indexOf(this.User.userId) === -1) { // 赞
+            arr.push(this.User.userId)
+            paperStrip.star = paperStrip.star + 1
+          } else { // 取消赞
+            let index = arr.indexOf(this.User.userId)
+            arr.splice(index, 1)
+            paperStrip.star = paperStrip.star - 1
+          }
+          let JSONArr = JSON.stringify(arr)
+          paperStrip.starUserId = JSONArr
+        } else {
+          main.openWarningInfo(data.msg)
         }
       })
     }

@@ -150,7 +150,6 @@ export default {
       this.$refs[form].validate(valid => {
         if (valid) {
           this.form.userName = this.User.userName
-
           let reqData = main.clone(this.form)
           reqData.languageSign = JSON.stringify(reqData.languageSign)
 

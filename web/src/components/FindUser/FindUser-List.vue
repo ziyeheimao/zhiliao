@@ -90,6 +90,12 @@ export default {
     activate (v, k) {
       this.activateIndex = k // 激活颜色
       this.$emit('activate', k)
+
+      if (this.$route.name === 'FindUser' && this.$route.query.userId === v.userId) return
+      this.$router.push({
+        name: `FindUser`,
+        query: { userName: v.userName, userId: v.userId }
+      })
     }
   },
   beforeCreate () {},
@@ -107,7 +113,6 @@ export default {
       this.getSectionWidth()
     }
   }
-
 }
 </script>
 

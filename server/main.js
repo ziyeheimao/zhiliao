@@ -23,6 +23,26 @@ const reg = {
   charset: /<meta[^>]*?charset=(["\']?)([a-zA-z0-9\-\_]+)(\1)[^>]*?>/is
 }
 
+// 数组
+const arr = {
+  // 去重
+  distinct: function (...rest) {
+    return Array.from(new Set([...rest]))
+  }
+}
+
+const obj = {
+  // 克隆对象
+  clone: function (obj) {
+    let newObj = {}
+    for (let k in obj) {
+      newObj[k] = obj[k]
+    }
+    return newObj
+  }
+}
+
+
 // 随机
 const random = {
   // 取两个数之间随机数
@@ -395,6 +415,8 @@ const distinctById = function (PrimaryKeyId, arr) {
 }
 
 module.exports = {
+  arr,
+  obj,
   serverIp,
   serverPort,
   DBHost,

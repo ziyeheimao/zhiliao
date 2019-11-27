@@ -116,6 +116,11 @@ export default {
   // 通过用户id获取该用户所有纸条u
   findPaperStripByUserId (userId) {
     return axios.get(`/ctn/findPaperStripByUserId?userId=${userId}`)
+  },
+
+  // 点赞/取消点赞
+  star (data) {
+    return axios.put(`/ctn/star`, data)
   }
   // -------------------------------------------------内容↑-----------------------------------------------------
 

@@ -19,21 +19,72 @@ router.post(`/news`, (req, res) => {
   let limit = 90;
   let time = new Date().getTime(); // 当前时间戳
 
+  let _findAll = function () { // 未登录或者该用户没有发过纸条
+    let sql = `SELECT * FROM paper_strip ORDER BY star DESC limit ?,?` // LIMIT ?,?
+    pool.query(sql, [(page - 1) * limit, limit], (err, data) => { // , page, limit
+      if (err) throw err;
+      res.send({ code: 0, data })
+    })
+  }
+
+  let languageSignAggregate = null // 当前用户发布纸条包含的语言
+  let _find = function () {
+    return new Promise((open, error) => {
+      let sql = 'SELECT languageSign FROM paper_strip WHERE userId=?'
+      pool.query(sql, userId, (err, data) => {
+        if (err) throw err;
+        if (data.length > 0) { // 已登录查该用户以往发帖的语言 并推荐相同的语言
+          let arr = []
+          for (let i of data) {
+            let narr = JSON.parse(i.languageSign)
+            for (let k of narr) {
+              arr.push(k)
+            }
+          }
+
+          languageSignAggregate = main.arr.distinct(...arr)
+
+          if (languageSignAggregate.length === 0) _findAll()
+          else open()
+        } else _findAll() // 如果该用户没有发帖查全部
+      })
+    })
+  }
+
+  let _findByLanguage = function () { // 通过当前用户的语言集合具有针对性查询推送信息
+    let sql = `SELECT * FROM paper_strip WHERE userId !=? AND ( ` // 语言条件
+    let reqSql = [userId]
+
+    for (let i = 0; i < languageSignAggregate.length; i++) {
+      reqSql.push(`%[${languageSignAggregate[i]}]%`)
+      reqSql.push(`%[${languageSignAggregate[i]},%`)
+      reqSql.push(`%,${languageSignAggregate[i]}]%`)
+      reqSql.push(`%,${languageSignAggregate[i]},%`)
+      sql += ' languageSign LIKE ? OR languageSign LIKE ? OR languageSign LIKE ? OR languageSign LIKE ? OR '
+    }
+
+    reqSql.push((page - 1) * limit, limit)
+    sql = sql.slice(0, -3)
+
+    sql += ` ) ORDER BY star DESC LIMIT ?,?` // LIMIT ?,?
+
+    pool.query(sql, reqSql, (err, data) => { // , page, limit
+      if (err) throw err;
+      if (data.length === 0) _findAll() // 如果当前用使用的语言数据库内 没有对应纸条 推送其它语言纸条
+      else res.send({ code: 0, data })
+    })
+  }
+
+  let _async = async function () {
+    await _find()
+    await _findByLanguage()
+  }
   // 如果 1用户登陆了登陆了 获取该用户所有纸条的语言类型并去重
   //    获取除当前用户外的 日期在距今一周内所有(语言类型符合上述条件)的纸条 按点赞数排序取前30名send
   if (userId) {
-    let sql = `SELECT * FROM paper_strip ORDER BY star DESC limit ?,?` // LIMIT ?,?
-    pool.query(sql, [(page - 1) * limit, limit], (err, data) => { // , page, limit
-      if (err) throw err;
-      res.send({ code: 0, data })
-    })
-    // res.send({ code: 1, msg: '登录后的推荐列表还在开发中' })
-  } else { // 否则 纸条表取 取点赞数排序前30名send
-    let sql = `SELECT * FROM paper_strip ORDER BY star DESC limit ?,?` // LIMIT ?,?
-    pool.query(sql, [(page - 1) * limit, limit], (err, data) => { // , page, limit
-      if (err) throw err;
-      res.send({ code: 0, data })
-    })
+    _async()
+  } else { // 未登录 纸条表取 取点赞数排序前90名send
+    _findAll()
   }
 })
 // 首页推荐列表
@@ -286,7 +337,7 @@ router.post(`/releasePaperStrip`, (req, res) => {
     return
   }
 
-  let sql = `INSERT INTO paper_strip VALUES (NULL,?,?,?,?,?,NULL,?,?,0,NULL)`;
+  let sql = `INSERT INTO paper_strip VALUES (NULL,?,?,?,?,?,NULL,?,?,0,'[]')`;
   pool.query(sql, [userId, userName, title, content, keyword, releaseTime, languageSign], (err, result) => {
     if (err) throw err;
     if (result.affectedRows > 0) {
@@ -350,7 +401,6 @@ router.put(`/upDataPaperStrip`, (req, res) => {
     return
   }
 
-  //执行SQL语句
   let sql = 'UPDATE paper_strip SET userName=?, title=?, content=?, keyword=?, languageSign=? WHERE userId=? AND paperStripId=?'
 
   pool.query(sql, [userName, title, content, keyword, languageSign, userId, paperStripId], (err, result) => {
@@ -382,6 +432,84 @@ router.get(`/findPaperStripByUserId`, (req, res) => {
   })
 })
 // 通过用户id获取该用户所有纸条 ↑
+
+// 点赞/取消点赞
+router.put('/star', (req, res) => {
+  let obj = req.body;
+  let userId = main.token.toUserId(req.headers.token);
+  let paperStripId = obj.paperStripId; // 纸条id
+  if (!paperStripId) {
+    res.send({ data: -1, msg: 'paperStripId 不可为空'})
+    return
+  }
+  let paperStrip = null // 当前纸条
+
+  // 查
+  let _find = function () {
+    return new Promise((open, err) => {
+      let sql = `SELECT * FROM paper_strip WHERE paperStripId=?`
+      pool.query(sql,[paperStripId], (err, data) => {
+        if (err) throw err;
+        if (data.length > 0) {
+          paperStrip = data[0]
+          open()
+        } else {
+          res.send({code: 1, data: [], msg: '该纸条已被作者删除 或被和谐 ╮(๑•́ ₃•̀๑)╭'})
+        }
+      })
+    })
+  }
+
+  // 改
+  let _updata = function () {
+    return new Promise((open, err) => {
+      let arr = JSON.parse(paperStrip.starUserId)
+      if (!arr.length) arr = [] // 防止arr 不是函数的情况
+      let index = arr.indexOf(userId)
+
+      let sql = 'UPDATE paper_strip SET starUserId=? star=? WHERE paperStripId=?'
+      if (index === -1) { // 点赞
+        arr.push(userId)
+        let JSONArr = JSON.stringify(arr)
+
+        pool.query(sql, [JSONArr, paperStripId, paperStrip.star + 1], (err, result) => {
+          if (err) throw err;
+
+          if (result.affectedRows > 0) { // 判断是否更改成功
+            res.send({ code: 0, msg: '点赞成功' });
+          } else {
+            res.send({ code: 1, msg: '点赞失败' });
+          }
+        });
+      } else { // 取消点赞
+        arr.splice(index, 1)
+        let JSONArr = JSON.stringify(arr)
+
+        pool.query(sql, [JSONArr, paperStripId, paperStrip.star - 1], (err, result) => {
+          if (err) throw err;
+
+          if (result.affectedRows > 0) { // 判断是否更改成功
+            res.send({ code: 0, msg: '取消点赞成功' });
+          } else {
+            res.send({ code: 1, msg: '取消点赞失败' });
+          }
+        });
+      }
+    })
+  }
+
+  let async = async function () {
+    await _find()
+    await _updata()
+  }
+
+  async()
+})
+// 点赞/取消点赞
+
+
+
+
 
 /*
 跨表分页查询

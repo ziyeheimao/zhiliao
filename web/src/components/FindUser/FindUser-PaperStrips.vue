@@ -10,7 +10,7 @@
 
         <p v-html="v.content"></p>
       </li>
-      <li class="null" v-if="paperStrip.length === 0">这家伙很懒 什么都没留下 (。_。)... </li>
+      <li class="null" v-if="paperStrip.length === 0">这家伙很懒 什么都没留下 ╮(๑•́ ₃•̀๑)╭ </li>
     </ul>
   </div>
 </template>

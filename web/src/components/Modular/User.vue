@@ -216,6 +216,10 @@ export default {
                 window.sessionStorage.setItem('user', user)
 
                 this.dialogVisible = false
+                this.$router.push('/blank')
+                setTimeout(() => {
+                  this.$router.go(-1)
+                }, 500)
               }
             })
           }, 300)

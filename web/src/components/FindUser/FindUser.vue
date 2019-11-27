@@ -28,7 +28,7 @@
 
           <!-- 纸条列表 & 粉丝 & 关注 -->
           <el-main :class="width <= 768 ? '' : 'xl-padding'">
-            <PaperStrips v-if='activate !== -1 && FindUserList.length !== 0' :UserId='FindUserList[activate].userId'></PaperStrips>
+            <PaperStrips v-if='activate !== -1 && FindUserList.length !== 0' :UserId='activate !== -1 ? FindUserList[activate].userId : ""'></PaperStrips>
           </el-main>
         </el-container>
 
@@ -76,20 +76,18 @@ export default {
   data () {
     return {
       width_: '',
-      activate: -1
+      activate: 0
     }
   },
   methods: {
     // 子组件传来的参数
     listActivate (data) {
       this.activate = data
-      window.sessionStorage.setItem('activateUserIndex', data)
     }
   },
   beforeCreate () {},
   created () {
     this.width_ = this.width
-    window.sessionStorage.getItem('activateUserIndex') !== null ? this.activate = window.sessionStorage.getItem('activateUserIndex') : this.activate = -1
   },
   beforeMount () {},
   mounted () {},
@@ -104,7 +102,7 @@ export default {
         this.$router.push('/blank')
         setTimeout(() => {
           this.$router.go(-1)
-        }, 200)
+        }, 500)
       }
       this.width_ = this.width
     }

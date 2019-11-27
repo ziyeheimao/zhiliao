@@ -11,6 +11,10 @@
         <el-link type="primary" :underline="false">
           <output>{{v.releaseTime | dateTimetrans}}</output>
         </el-link>
+
+        <el-link type="primary" @click.stop="star(v)" :disabled='Token ? false : true'>
+          <output>{{JSON.parse(v.starUserId).indexOf(User.userId) === -1 ? '赞:' : '取消赞:'}} {{v.star}}</output>
+        </el-link>
       </div>
 
       <p v-html="v.content"></p>
@@ -21,8 +25,8 @@
 </template>
 
 <script>
-// import api from '@api'
-// import main from '@main'
+import api from '@api'
+import main from '@main'
 
 export default {
   components: {
@@ -32,6 +36,12 @@ export default {
   computed: {
     Listdata () {
       return this.$store.getters.Listdata
+    },
+    Token () {
+      return this.$store.getters.Token
+    },
+    User () {
+      return this.$store.getters.User
     }
   },
   data () {
@@ -59,6 +69,30 @@ export default {
       this.$store.commit('SSearchCondition', data)
 
       this.$router.push('/details')
+    },
+
+    // 点赞 取消点赞
+    star (paperStrip) {
+      let data = { paperStripId: paperStrip.paperStripId }
+      api.star(data).then(({data}) => {
+        if (data.code === 0) {
+          // 前端视图
+          let arr = JSON.parse(paperStrip.starUserId)
+          if (!arr.length) arr = []
+          if (JSON.parse(paperStrip.starUserId).indexOf(this.User.userId) === -1) { // 赞
+            arr.push(this.User.userId)
+            paperStrip.star = paperStrip.star + 1
+          } else { // 取消赞
+            let index = arr.indexOf(this.User.userId)
+            arr.splice(index, 1)
+            paperStrip.star = paperStrip.star - 1
+          }
+          let JSONArr = JSON.stringify(arr)
+          paperStrip.starUserId = JSONArr
+        } else {
+          main.openWarningInfo(data.msg)
+        }
+      })
     }
   },
   beforeCreate () {},
@@ -93,6 +127,9 @@ export default {
     text-align: right;
     & > output {
       margin: 0 5px;
+    }
+    & > .el-link{
+      margin-right: 5px;
     }
   }
   & > p {
