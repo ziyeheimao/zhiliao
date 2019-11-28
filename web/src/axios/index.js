@@ -35,14 +35,24 @@ http.interceptors.request.use(
 // respone拦截器
 http.interceptors.response.use(res => {
   if (res.data.code === 1001) {
-    Message.error({message: res.data.msg}) // token问题
+    Message.error({message: res.data.msg}) // token过期
+
+    sessionStorage.clear() // 清除缓存
+    store.state.Token = ''
+    store.state.User = ''
+
     router.push('/') // 返回登陆页
   } else if (res.data.code === 1002) { // 接口开发中
     Message.error({message: res.data.msg})
   } else if (res.data.code === 1003) {
     Message.error({message: '用户不存在'})
   } else if (res.data.code === 1004) {
-    Message.error({message: 'token错误'})
+    Message.error({message: res.data.msg}) // token错误
+
+    sessionStorage.clear() // 清除缓存
+    store.state.Token = ''
+    store.state.User = ''
+
     router.push('/')
   } else {
     return res

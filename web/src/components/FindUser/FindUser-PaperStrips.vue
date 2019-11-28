@@ -34,13 +34,14 @@ export default {
   },
   data () {
     return {
-      paperStrip: []
+      paperStrip: [],
+      userId: this.$route.query.userId
     }
   },
   methods: {
     findPaperStripByUserId () {
-      if (!this.UserId) return
-      api.findPaperStripByUserId(this.UserId).then(({data}) => {
+      if (!this.userId) return
+      api.findPaperStripByUserId(this.userId).then(({data}) => {
         this.paperStrip = data.data.reverse()
       })
     },
@@ -70,7 +71,8 @@ export default {
   beforeDestroy () {},
   deactivated () {},
   watch: {
-    UserId () {
+    '$route.query.userId' () {
+      this.userId = this.$route.query.userId
       this.findPaperStripByUserId()
     }
   }

@@ -16,7 +16,7 @@ export default {
         // document.querySelector(this.props).scrollIntoView(true)
         document.scrollIntoView(true)
       } catch (err) {
-        if (err) { throw err } // 在这里处理错误
+        // if (err) { throw err } // 在这里处理错误
       }
     }
   },

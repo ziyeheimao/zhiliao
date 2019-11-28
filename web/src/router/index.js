@@ -108,7 +108,7 @@ const router = new Router({
       }
     },
     {
-      path: '/user',
+      path: '/user', // 个人中心
       name: 'User',
       component: User,
       meta: {
@@ -116,7 +116,7 @@ const router = new Router({
       }
     },
     {
-      path: '/paperStrip',
+      path: '/paperStrip', // 发布纸条
       name: 'PaperStrip',
       component: PaperStrip,
       meta: {
@@ -124,7 +124,7 @@ const router = new Router({
       }
     },
     {
-      path: '/findUser',
+      path: '/findUser', // 查找用户 我的纸条
       name: 'FindUser',
       component: FindUser,
       meta: {

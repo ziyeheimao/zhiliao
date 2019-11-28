@@ -24,15 +24,14 @@
               <output>{{JSON.parse(ctnData.starUserId).indexOf(User.userId) === -1 ? '赞:' : '取消赞:'}} {{ctnData.star}}</output>
             </el-link>
 
-            <el-link type="success" @click="beforeupDataPaperStrip" v-if="ctnData.userId === User.userId">修改内容</el-link>
+            <el-link type="success" @click="beforeupDataPaperStrip" v-if="ctnData.userId === User.userId">修改</el-link>
             <el-link type="danger" @click="delDialogVisible = true" v-if="ctnData.userId === User.userId">删除</el-link>
           </div>
 
           <div class="ctn" v-html="ctnData.content" v-if="ctnData.languageSign.indexOf(1) === -1" v-highlight></div>
           <div class="ctn" v-if="ctnData.languageSign.indexOf(1) !== -1" v-highlight>
-            <pre><code>{{ctnData.content}}</code></pre>
+            <pre><code v-text="ctnData.content"></code></pre>
           </div>
-
         </div>
 
         <!-- 删除 -->
@@ -108,21 +107,23 @@
                 <input type="file" id="insertPic"  @change="insertPic">
               </div>
 
-              <Backtop>
-                <div style="{
-                  height: 40px; width: 40px;
-                  text-align: center; line-height: 40px; color: #1989fa;
-                  background-color: #f2f5f6; box-shadow: 0px 0px 6px #00000070;
-                  border: 1px solid #eee; border-radius: 50%; font-size: 2rem; }">
-                  <i class="el-icon-caret-top"></i>
-                </div>
-              </Backtop>
             </el-main>
 
             <el-aside :width="width > 1440 ? '200px' : '100px'" v-show="width > 992"></el-aside>
           </el-container>
 
         </el-dialog>
+
+        <Backtop>
+          <div style="{
+            height: 40px; width: 40px;
+            text-align: center; line-height: 40px; color: #1989fa;
+            background-color: #f2f5f6; box-shadow: 0px 0px 6px #00000070;
+            border: 1px solid #eee; border-radius: 50%; font-size: 2rem; }">
+            <i class="el-icon-caret-top"></i>
+          </div>
+        </Backtop>
+
       </el-main>
 
       <el-aside :width="width > 1440 ? '200px' : '100px'" v-show="width > 992"></el-aside>
@@ -214,8 +215,6 @@ export default {
           this.ctnData.languageSign = JSON.parse(this.ctnData.languageSign)
           if (this.ctnData.languageSign.indexOf(1) === -1) { // 帖子不包含内容html则转码
             this.ctnData.content = main.strToH5(this.ctnData.content)
-          } else { // 否则克隆后分段
-
           }
         }
       })
@@ -400,7 +399,13 @@ export default {
     this.language()
   },
   beforeMount () {},
-  mounted () {},
+  mounted () {
+    setTimeout(() => {
+      let a = this.ctnData.userId
+      this.ctnData.userId = ''
+      this.ctnData.userId = a
+    }, 200)
+  },
   beforeUpdate () {},
   updated () {},
   beforeDestroy () {},

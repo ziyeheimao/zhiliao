@@ -1,12 +1,31 @@
 const pool = require('./pool.js'); // 数据库 连接池
+const sjcl = require('sjcl'); // 斯坦福加密算法 // npm i sjcl
 
 const serverIp = 'http://127.0.0.1' // 后端服务器ip
 const serverPort = 80 // 服务器端口
-
 const DBHost = '127.0.0.1' // 数据库ip
 const corsHost = ['http://127.0.0.1', 'http://localhost'] // 跨域白名单 ip 域名
 
-const adoptPath = ['/user/login', '/user/checkUserNamePhoneEmail', '/user/register', '/user/verificationCode', '/user/forgetPassword'] // 无需携带token即可访问的 路由
+const adoptPath = [ // 无需携带token即可访问的 路由
+  // '/static',
+
+  '/user/login',
+  '/user/checkUserNamePhoneEmail',
+  '/user/register',
+  '/user/verificationCode',
+  '/user/forgetPassword',
+
+  '/ctn/news',
+  '/ctn/getHotWords',
+  '/ctn/widelySearch',
+  '/ctn/authorName',
+  '/ctn/author',
+  '/ctn/authorPaperStripCount',
+  '/ctn/paperStrip',
+  '/ctn/findPaperStripByUserId',
+
+  '/other/language'
+]
 
 // 字符串处理
 const str = {
@@ -80,6 +99,8 @@ const random = {
     return str;
   }
 }
+
+const secretKey = random.str(16) // token加密/解密密钥
 
 // 验证码
 const verificationCode = {
@@ -155,15 +176,13 @@ const verificationCode = {
 const token = {
   // 通过uid生成token
   create: function (user) {
-    let userId = user.userId
-    userId = userId.toString()
-    let token = userId.padStart(6, random.letter(6))
-    token += Math.random().toString(36).substr(2);
+    let userId = user.userId + ''
+    let token = sjcl.encrypt(secretKey, userId)
+    token = JSON.stringify(token)
+
     // 根据返回的用户信息中的设置 计算token时间戳
     let timeStamp = null
-
-    timeStamp = Number((new Date()).valueOf()) + 300000; // 获取当前毫秒的时间戳
-
+    timeStamp = Number((new Date()).valueOf()) + 1000 * 60 * 60 * 8; // 获取当前毫秒的时间戳 + 8小时token有效期
 
     this._valid(userId).then(validRes => {
       if (validRes === true) { // 已有token // 更新 token
@@ -208,23 +227,10 @@ const token = {
   },
   // 把token还原成uid
   toUserId: function (token) {
-    token = token.substr(0, 6)
-
-    let start = 0
-    for (let i = 0; i < token.length; i++) {
-      if (!isNaN(Number(token[i]))) { // 如果是数字
-        start = i
-        break
-      }
-    }
-    let userId = token.substr(start)
+    token = JSON.parse(token)
+    let userId = sjcl.decrypt(secretKey, token) // 解密数据
     userId = Number(userId)
     return userId
-  },
-
-  // 获取用户token是否过期 (timeStamp - 用户设置时长) 对比 当前时间戳
-  tokenTerm: function (userId) {
-
   }
 }
 
@@ -248,90 +254,44 @@ const middleware = {
   token: function(req, res, next) {
     let token_ = req.headers.token
     let url = req._parsedUrl.pathname // url // 获取用户访问的接口
-    console.log(url)
-
-    let adopt = ['/static', '/login', '/checkUserNamePhoneEmail', '/register', '/verificationCode', '/forgetPassword']
-
-    for (let i of adopt) {
-      if (url.indexOf(i) !== -1) { // 访问静态资源或登录接口时 直接通过
-        return next()
-      }
-    }
-
-    let process = 0 // 进度
-    let userSetTimeStamp = null // 用户设置的token时效 时间戳
     let expireTimeStamp = null // 本次登录到期时间戳
+    // console.log(url)
+
     // 检测是否携带token
     if (!token_) { // 没有token
-      if (adoptPath.includes(url) === false) { // 且不在不携带token可访问的范围内
-        res.send({code: 1001, msg: '请携带token访问该接口'})
+      if (adoptPath.includes(url) === true) { // 在不携带token可访问范围内
+        return next()
+      } else {
+        res.send({code: 1001, msg: '请携带token访问此接口'})
         return
       }
-    }
+    } else if (token_) { // 检测token是否过期
 
-    // 检测token是否过期
-    if (token_) {
       let userId = token.toUserId(token_)
 
-      // 获取用户设置的token时效 时间戳
-      user.get(userId, 'cache').then(resolve => {
-        if (resolve === false) {
-          res.send({code: 1001, msg: 'token错误，请重新登录'})
-        } else {
-
-          switch (resolve.cache) {
-            case 'session': // 会话级缓存直接过
-              return next();
-
-            case 'local': // 跨会话级缓存直接过
-              return next();
-
-            default: // 有时效的检测token时效
-              userSetTimeStamp = Number(resolve.cache)
-              process += 50
-              
-              if (process === 100) {
-                let valid = middleware._tokenValid(userSetTimeStamp, expireTimeStamp)
-                if (valid) {
-                  return next()
-                } else {
-                  res.send({code: 1001, msg: 'token已过期, 请重新登录'})
-                }
-              }
-              break
-          }
-
-        }
-      })
-
       // 获取token到期 时间戳
-      user.getTimeStamp(userId).then(resolve => {
-        expireTimeStamp = resolve.timeStamp
-        process += 50
+      user.getTimeStamp(userId).then(resolve => { // 根据userId 查token表
+        if (resolve === false) { // 表里没有当前用户token
+          res.send({code: 1004, msg: 'token错误请重新登录'})
+          return
+        } else {
+          expireTimeStamp = resolve.timeStamp
 
-        if (process === 100) {
-          let valid = middleware._tokenValid(userSetTimeStamp, expireTimeStamp)
+          let valid = middleware._tokenValid(expireTimeStamp)
           if (valid) {
             return next()
           } else {
             res.send({code: 1001, msg: 'token已过期, 请重新登录'})
           }
         }
-
       })
-    } else {
-      return next();
     }
   },
 
-  _tokenValid: function (userSetTimeStamp, expireTimeStamp) {
-    // console.log('登录时间', date.timetrans(expireTimeStamp))
-    // console.log('设置时效', date.timetrans(userSetTimeStamp))
-    // console.log('到期时间', date.timetrans(expireTimeStamp + userSetTimeStamp))
-    // console.log('当前时间', date.timetrans(new Date().valueOf()))
-
-    //      登陆时间          设置时效              当前时间
-    if (expireTimeStamp + userSetTimeStamp > new Date().valueOf()) { // 未过期
+  _tokenValid: function (expireTimeStamp) {
+    //      到期时间              当前时间
+    if (expireTimeStamp > new Date().valueOf()) { // 未过期
+      // console.log('token到期时间', expireTimeStamp, '当前时间', new Date().valueOf())
       return true
     } else { // 已过期
       return false

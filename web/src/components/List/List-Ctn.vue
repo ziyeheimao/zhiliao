@@ -97,7 +97,7 @@ export default {
             main.openWarningInfo(data.msg)
           }
         })
-      })
+      }, 300)
     }
   },
   beforeCreate () {},
