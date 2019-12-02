@@ -29,8 +29,17 @@ const adoptPath = [ // 无需携带token即可访问的 路由
 
 // 字符串处理
 const str = {
-  trim: function (str) { // 删除开头和结尾的空字符
+  // 删除开头和结尾的空字符
+  trim: function (str) {
     return str.replace(/^\s+|\s+$/g, '');
+  },
+
+  // 将字符串中所有  原字符   目标       替换内容
+  replace: function (str, targetCtn, replaceCtn) {
+    if (typeof str !== 'string') return str
+    let reg = new RegExp(`${targetCtn}`, "g")
+    str = str.replace(reg, replaceCtn) // '替换
+    return str
   }
 }
 
@@ -246,6 +255,60 @@ const date = {
     var m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':';          // 分
     var s = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds());                // 秒
     return Y + M + D + h + m + s;
+  },
+
+  // 获取当前系统时间
+  getDate: function (isWeekDay = false, timeStr = '-', timeStr2 = ':') {
+    let date = new Date();
+
+    let Year = date.getFullYear(); // 获取年(4位)
+
+    let Month = date.getMonth() + 1; // 获取月份(0-11, 0是1月)
+    if (Month < 10) Month = '0' + Month;
+
+    let Day = date.getDate(); // 获取日(1-31)
+    if (Day < 10) Day = '0' + Day;
+
+    let WeekDay = date.getDay(); // 获取星期(0-6 , 0是星期日)
+    switch (WeekDay) {
+      case 0:
+        WeekDay = '星期日'
+        break
+      case 1:
+        WeekDay = '星期一'
+        break
+      case 2:
+        WeekDay = '星期二'
+        break
+      case 3:
+        WeekDay = '星期三'
+        break
+      case 4:
+        WeekDay = '星期四'
+        break
+      case 5:
+        WeekDay = '星期五'
+        break
+      case 6:
+        WeekDay = '星期六'
+        break
+    }
+
+
+    let Hour = date.getHours(); // 获取小时(0-23)
+    if (Hour < 10) Hour = '0' + Hour;
+
+    let Minute = date.getMinutes(); // 获取分钟(0-59)
+    if (Minute < 10) Minute = '0' + Minute;
+
+    let Sec = date.getSeconds(); // 获取秒数(0-59)
+    if (Sec < 10) Sec = '0' + Sec;
+
+    let current = Year + timeStr + Month + timeStr + Day + ' ' + Hour + timeStr2 + Minute + timeStr2 + Sec
+
+    if (isWeekDay) current = current + ' ' + WeekDay // 是否需要星期几
+
+    return current
   }
 };
 
@@ -255,7 +318,7 @@ const middleware = {
     let token_ = req.headers.token
     let url = req._parsedUrl.pathname // url // 获取用户访问的接口
     let expireTimeStamp = null // 本次登录到期时间戳
-    // console.log(url)
+    console.log(url)
 
     // 检测是否携带token
     if (!token_) { // 没有token

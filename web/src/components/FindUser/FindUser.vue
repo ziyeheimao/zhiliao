@@ -76,7 +76,7 @@ export default {
   data () {
     return {
       width_: '',
-      activate: 0
+      activate: -1
     }
   },
   methods: {

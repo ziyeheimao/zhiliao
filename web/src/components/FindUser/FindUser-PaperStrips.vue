@@ -8,7 +8,7 @@
           <output>{{v.releaseTime | dateTimetrans}}</output>
         </div>
 
-        <p v-html="v.content"></p>
+        <p v-text="v.content"></p>
       </li>
       <li class="null" v-if="paperStrip.length === 0">这家伙很懒 什么都没留下 ╮(๑•́ ₃•̀๑)╭ </li>
     </ul>
@@ -40,9 +40,9 @@ export default {
   },
   methods: {
     findPaperStripByUserId () {
-      if (!this.userId) return
+      if (!this.userId || !this.userId === 'undefined') return
       api.findPaperStripByUserId(this.userId).then(({data}) => {
-        this.paperStrip = data.data.reverse()
+        if (data.code === 0) this.paperStrip = data.data.reverse()
       })
     },
     details (v) {

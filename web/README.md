@@ -1,6 +1,6 @@
 # web
 
-> zhiliao Vue.js project
+> A Vue.js project
 
 ## Build Setup
 

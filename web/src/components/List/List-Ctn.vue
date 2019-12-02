@@ -17,7 +17,7 @@
         </el-link>
       </div>
 
-      <p v-html="v.content"></p>
+      <p v-text="v.content"></p>
     </li>
 
     <li class="null" v-if="Listdata.length === 0">暂无数据 请尝试更换关键词 (。_。)... </li>

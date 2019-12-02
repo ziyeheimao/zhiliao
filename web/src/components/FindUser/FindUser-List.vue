@@ -19,13 +19,6 @@
                   <span class="sex" :class="v.sex === 1 ? 'sex1' : v.sex === 2 ? 'sex2' : ''">{{v.sex | sex}}</span>
                 </output>
               </p>
-
-              <!-- <p>
-                <output>
-                  纸条:
-                  <el-link type="primary">{{v.sex}}</el-link>
-                </output>
-              </p> -->
             </div>
           </li>
         </ul>

@@ -67,6 +67,28 @@ const distinct = function (...rest) {
   return Array.from(new Set([...rest]))
 }
 
+// 对对象数组按某个属性去重
+const distinctByKey = function (key, arr) {
+  let keyList = []
+  for (let i of arr) {
+    keyList.push(i[key])
+  }
+
+  keyList = Array.from(new Set([...keyList]))
+
+  let resArr = []
+  for (let i of keyList) {
+    for (let j of arr) {
+      if (i === j[key]) {
+        resArr.push(j)
+        break
+      }
+    }
+  }
+
+  return resArr
+}
+
 // 限制数组为指定长度
 const len = function (arr, len) {
   if (arr.length === undefined || arr === undefined) {
@@ -205,6 +227,7 @@ export default {
   clone,
   delSpace,
   distinct,
+  distinctByKey,
   len,
   openInfo,
   openSuccessInfo,

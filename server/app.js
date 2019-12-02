@@ -7,6 +7,9 @@ const bodyParser = require('body-parser'); // 解析post请求主体
 // 工具类
 const main = require('./main.js')
 
+// 定时执行
+const timer = require('./timer.js') // 定时任务
+
 // 路由
 const user = require('./routes/user.js'); // 用户模块
 const ctn = require('./routes/ctn.js'); // 内容模块

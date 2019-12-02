@@ -22,8 +22,8 @@
 
       <li v-for="(v, k) in res.hotWords" :key="k"
         @click="clickLi(v)" :class="k === activateIndex ? 'activate' : ''">
-        <span :style="'max-width:'+(inputWidth-35)+'px'">{{v}}</span>
-        <i class="el-icon-close" v-show="mode" @click.stop="del(v)"></i>
+        <span :style="'max-width:'+(inputWidth-35)+'px'">{{v.userName}}</span>
+        <i class="el-icon-close" v-show="mode" @click.stop="del(v.userName)"></i>
       </li>
 
     </ul>
@@ -97,12 +97,12 @@ export default {
       var authorNameHistory = null
 
       if (history === null) { // 没有历史纪录时
-        let arr = [this.keyword]
+        let arr = [{ userName: this.keyword, userId: this.userId }]
         authorNameHistory = JSON.stringify(arr) // 转json
       } else { // 有历史记录时
         let historyArr = JSON.parse(history)
-        historyArr.unshift(this.keyword)
-        historyArr = main.distinct(...historyArr) // 数组去重
+        historyArr.unshift({ userName: this.keyword, userId: this.userId })
+        historyArr = main.distinctByKey('userName', historyArr) // 数组按userName去重
         historyArr = main.len(historyArr, 15) // 限制历史记录个数 // 如果数组长度大于15 尾巴切掉 只留15个记录
         authorNameHistory = JSON.stringify(historyArr) // 转数组
       }
@@ -125,7 +125,7 @@ export default {
 
       switch (e.keyCode) {
         case 13: // 回车搜索
-          if (this.activateIndex !== -1) this.keyword = this.res.hotWords[this.activateIndex]
+          if (this.activateIndex !== -1) this.keyword = this.res.hotWords[this.activateIndex].userName
           this.search()
           break
 
@@ -155,17 +155,21 @@ export default {
       this.timer = setTimeout(() => {
         api.authorName(this.keyword).then(({data}) => {
           this.mode = false
-          this.res.hotWords = []
-
-          for (let i = 0; i < data.data.length; i++) {
-            this.res.hotWords.push(data.data[i].userName)
-          }
+          this.res.hotWords = data.data
         })
       }, 300)
     },
     // 点击热词
     clickLi (value) {
-      this.keyword = value
+      this.keyword = value.userName
+
+      if (this.$route.name === 'FindUser' && this.$route.query.userName === value.userName) return
+
+      this.$router.push({
+        name: `FindUser`,
+        query: { userName: value.userName, userId: value.userId }
+      })
+
       this.search()
     },
 
@@ -217,8 +221,9 @@ export default {
       this.userId = this.$route.query.userId
     }
     this.keyword = this.$route.query.userName || ''
-    // this.author()
-    this.search()
+
+    this.author()
+    // this.search()
   },
   beforeMount () {},
   mounted () {},
